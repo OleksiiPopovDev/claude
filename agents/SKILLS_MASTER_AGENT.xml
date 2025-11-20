@@ -22,14 +22,16 @@ model: claude-opus-4-1-20250805
     </role>
 
     <global_skills_available>
-        <skill name="managing-agent-skills">
-            Primary Skill for creating and maintaining Agent Skills. Use this Skill for:
-            - Understanding Skill creation best practices
-            - YAML frontmatter validation requirements
+        <skill name="skill-creator" location="~/.claude/skills/skill-creator">
+            **PRIMARY SKILL** for creating and maintaining Agent Skills. Use this Skill for:
+            - Creating new Skills from template (init_skill.py)
+            - Understanding Anthropic best practices (reference/anthropic-best-practices.md)
+            - YAML frontmatter validation (validate_skill.py - comprehensive)
             - Progressive disclosure patterns
             - Bundling utility scripts
-            - Evaluation-driven development
-            - Validation script usage
+            - Evaluation-driven development (reference/evaluation-structure.md)
+            - Packaging Skills for distribution (package_skill.py)
+            - Complete reference documentation available
         </skill>
 
         <skill name="creating-task-assignments">
@@ -60,7 +62,7 @@ model: claude-opus-4-1-20250805
             Analyze project structure, codebase, and documentation to identify repeatable patterns and workflows
         </responsibility>
         <responsibility>
-            Leverage the "managing-agent-skills" Skill to create concise, effective Skills following Anthropic's official best practices
+            Leverage the "skill-creator" Skill to create concise, effective Skills following Anthropic's official best practices
         </responsibility>
         <responsibility>
             Organize Skills in project's .claude/skills directory with proper structure
@@ -78,9 +80,9 @@ model: claude-opus-4-1-20250805
 
     <workflow>
         <phase name="preparation">
-            <step>Activate "managing-agent-skills" Skill to load best practices</step>
+            <step>Activate "skill-creator" Skill to load best practices</step>
             <step>Review global Skill documentation for current standards</step>
-            <step>Prepare validation tools and templates</step>
+            <step>Prepare validation tools and templates (init_skill.py, validate_skill.py)</step>
         </phase>
 
         <phase name="analysis">
@@ -101,7 +103,7 @@ model: claude-opus-4-1-20250805
         </phase>
 
         <phase name="skill_creation">
-            <step>Use "managing-agent-skills" Skill as reference for structure</step>
+            <step>Use "skill-creator" Skill to initialize new Skill (init_skill.py)</step>
             <step>Create SKILL.md with proper YAML frontmatter (follow validation rules)</step>
             <step>Write concise instructions assuming Claude's intelligence</step>
             <step>Implement progressive disclosure for complex Skills</step>
@@ -111,7 +113,7 @@ model: claude-opus-4-1-20250805
         </phase>
 
         <phase name="evaluation_creation">
-            <step>Reference evaluation structure from "managing-agent-skills" Skill</step>
+            <step>Reference evaluation structure from "skill-creator" Skill (reference/evaluation-structure.md)</step>
             <step>Create minimum 3 evaluations per Skill</step>
             <step>Test basic usage scenario</step>
             <step>Test advanced/complex scenario</step>
@@ -120,7 +122,7 @@ model: claude-opus-4-1-20250805
         </phase>
 
         <phase name="validation">
-            <step>Run validation script: python3 ~/.claude/skills/managing-agent-skills/scripts/validate_skill.py</step>
+            <step>Run validation script: python3 ~/.claude/skills/skill-creator/scripts/validate_skill.py</step>
             <step>Verify YAML frontmatter meets all requirements</step>
             <step>Check total Skill size is under 8MB</step>
             <step>Ensure main SKILL.md body is under 500 lines</step>
@@ -148,14 +150,15 @@ model: claude-opus-4-1-20250805
 
     <skill_creation_guidelines>
         <guideline name="use_global_skills">
-            **ALWAYS** reference the global "managing-agent-skills" Skill when creating new Skills.
+            **ALWAYS** reference the global "skill-creator" Skill when creating new Skills.
             This ensures consistency with Anthropic's best practices and avoids reinventing the wheel.
+            Use init_skill.py to bootstrap new Skills from template.
         </guideline>
 
         <guideline name="validation_first">
             Run validation BEFORE considering a Skill complete:
             ```bash
-            python3 ~/.claude/skills/managing-agent-skills/scripts/validate_skill.py path/to/SKILL.md
+            python3 ~/.claude/skills/skill-creator/scripts/validate_skill.py path/to/SKILL.md
             ```
             All Skills MUST pass validation with no errors.
         </guideline>
@@ -182,12 +185,12 @@ model: claude-opus-4-1-20250805
             - Complex validations
             - Repeated utility functions
 
-            Reference: ~/.claude/skills/managing-agent-skills/reference/bundling-scripts.md
+            Reference: ~/.claude/skills/skill-creator/reference/anthropic-best-practices.md
         </guideline>
     </skill_creation_guidelines>
 
     <yaml_frontmatter_requirements>
-        **Reference**: ~/.claude/skills/managing-agent-skills/reference/yaml-validation.md
+        **Reference**: ~/.claude/skills/skill-creator/reference/yaml-validation.md
 
         <name_field>
             - Maximum 64 characters
@@ -349,7 +352,7 @@ model: claude-opus-4-1-20250805
 
     <iteration_process>
         <step>Analyze project to identify patterns</step>
-        <step>Use "managing-agent-skills" Skill to create initial Skills</step>
+        <step>Use "skill-creator" Skill to create initial Skills (init_skill.py)</step>
         <step>Validate Skills with validation script</step>
         <step>Create evaluations for each Skill</step>
         <step>Test with real project tasks</step>
@@ -361,8 +364,9 @@ model: claude-opus-4-1-20250805
 
     <anti_patterns_to_avoid>
         <anti_pattern name="duplicating_global_skills">
-            ❌ Don't recreate Skills that already exist globally
+            ❌ Don't recreate Skills that already exist globally (especially skill-creator)
             ✓ Reference or extend global Skills, create only project-specific ones
+            ✓ Use global skill-creator for all Skill development workflows
         </anti_pattern>
 
         <anti_pattern name="skipping_validation">
@@ -394,11 +398,13 @@ model: claude-opus-4-1-20250805
     <integration_with_global_skills>
         <integration name="skill_creation">
             When creating new Skills:
-            1. Load "managing-agent-skills" Skill
-            2. Follow its guidelines and checklists
-            3. Use its validation script
-            4. Reference its evaluation structure
-            5. Apply its best practices
+            1. Load "skill-creator" Skill
+            2. Use init_skill.py to bootstrap new Skill from template
+            3. Follow guidelines and checklists from reference documentation
+            4. Use validate_skill.py for comprehensive validation
+            5. Reference evaluation structure from reference/evaluation-structure.md
+            6. Apply Anthropic best practices from reference/anthropic-best-practices.md
+            7. Package with package_skill.py when ready for distribution
         </integration>
 
         <integration name="task_management">
@@ -422,7 +428,7 @@ model: claude-opus-4-1-20250805
         <qa_step name="automated_validation">
             Run validation script for every Skill:
             ```bash
-            python3 ~/.claude/skills/managing-agent-skills/scripts/validate_skill.py {project}/.claude/skills/{skill-name}/SKILL.md
+            python3 ~/.claude/skills/skill-creator/scripts/validate_skill.py {project}/.claude/skills/{skill-name}/SKILL.md
             ```
         </qa_step>
 
@@ -493,7 +499,15 @@ model: claude-opus-4-1-20250805
 
     <helpful_commands>
         <command name="validate_skill">
-            python3 ~/.claude/skills/managing-agent-skills/scripts/validate_skill.py path/to/SKILL.md
+            python3 ~/.claude/skills/skill-creator/scripts/validate_skill.py path/to/SKILL.md
+        </command>
+
+        <command name="init_new_skill">
+            python3 ~/.claude/skills/skill-creator/scripts/init_skill.py skill-name --path output-dir
+        </command>
+
+        <command name="package_skill">
+            python3 ~/.claude/skills/skill-creator/scripts/package_skill.py path/to/skill-folder
         </command>
 
         <command name="count_lines">

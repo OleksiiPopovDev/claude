@@ -1,6 +1,6 @@
 ---
 name: skill-creator
-description: Guide for creating effective skills. This skill should be used when users want to create a new skill (or update an existing skill) that extends Claude's capabilities with specialized knowledge, workflows, or tool integrations.
+description: Guide for creating effective Agent Skills following Anthropic best practices. Use when creating new Skills, updating existing Skills, validating Skill structure, or packaging Skills for distribution. Includes workflows, validation scripts, and comprehensive reference documentation.
 license: Complete terms in LICENSE.txt
 ---
 
@@ -152,6 +152,8 @@ The script:
 
 After initialization, customize or remove the generated SKILL.md and example files as needed.
 
+**Important**: Review [Anthropic Best Practices](references/anthropic-best-practices.md) and [YAML Validation Rules](references/yaml-validation.md) before proceeding to ensure compliance with all requirements.
+
 ### Step 4: Edit the Skill
 
 When editing the (newly-generated or existing) skill, remember that the skill is being created for another instance of Claude to use. Focus on including information that would be beneficial and non-obvious to Claude. Consider what procedural knowledge, domain-specific details, or reusable assets would help another Claude instance execute these tasks more effectively.
@@ -172,9 +174,52 @@ To complete SKILL.md, answer the following questions:
 2. When should the skill be used?
 3. In practice, how should Claude use the skill? All reusable skill contents developed above should be referenced so that Claude knows how to use them.
 
-### Step 5: Packaging a Skill
+### Step 5: Validation and Quality Assurance
 
-Once the skill is ready, it should be packaged into a distributable zip file that gets shared with the user. The packaging process automatically validates the skill first to ensure it meets all requirements:
+Before packaging or deploying a skill, validate it thoroughly to ensure it meets all requirements.
+
+#### Comprehensive Validation
+
+Use the comprehensive validation script for full compliance checking:
+
+```bash
+python3 scripts/validate_skill.py <path/to/SKILL.md>
+```
+
+This script checks:
+- YAML frontmatter format and all required fields
+- Name: max 64 chars, lowercase/numbers/hyphens only, no reserved words
+- Description: max 1024 chars, third person, includes what AND when
+- SKILL.md body line count (recommends under 500 lines)
+- No time-sensitive information
+- File paths use forward slashes
+
+**All Skills MUST pass this validation before being considered complete.**
+
+See [YAML Validation Rules](references/yaml-validation.md) for complete validation requirements.
+
+#### Creating Evaluations
+
+Create minimum 3 evaluations per Skill to verify effectiveness:
+1. Basic usage scenario
+2. Advanced/complex scenario
+3. Edge case/error handling scenario
+
+See [Evaluation Structure](references/evaluation-structure.md) for complete evaluation format and best practices.
+
+#### Quick Validation (Legacy)
+
+For quick basic checks during development:
+
+```bash
+python3 scripts/quick_validate.py <path/to/skill-folder>
+```
+
+Note: This provides minimal validation. Use `validate_skill.py` for comprehensive checking.
+
+### Step 6: Packaging a Skill
+
+Once the skill is validated and ready, package it into a distributable zip file:
 
 ```bash
 scripts/package_skill.py <path/to/skill-folder>
@@ -188,17 +233,14 @@ scripts/package_skill.py <path/to/skill-folder> ./dist
 
 The packaging script will:
 
-1. **Validate** the skill automatically, checking:
-   - YAML frontmatter format and required fields
-   - Skill naming conventions and directory structure
-   - Description completeness and quality
-   - File organization and resource references
+1. **Validate** the skill automatically using `quick_validate.py`
+2. **Package** the skill if validation passes, creating a zip file named after the skill (e.g., `my-skill.zip`)
 
-2. **Package** the skill if validation passes, creating a zip file named after the skill (e.g., `my-skill.zip`) that includes all files and maintains the proper directory structure for distribution.
+**Important**: Run comprehensive validation (`validate_skill.py`) before packaging to ensure full compliance with Anthropic best practices.
 
 If validation fails, the script will report the errors and exit without creating a package. Fix any validation errors and run the packaging command again.
 
-### Step 6: Iterate
+### Step 7: Iterate
 
 After testing the skill, users may request improvements. Often this happens right after using the skill, with fresh context of how the skill performed.
 

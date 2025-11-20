@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task_manager_prompt>
+
+    <your_role>@/Users/oleksii/.claude/agents/TASK_MANAGER_PROMPT.xml</your_role>
+
+    <instruction>
+        Prepare a task description for collaboration of the following roles in priority order:
+    </instruction>
+
+    <agent_roles priority_order="true">
+        <agent priority="1">@/Users/oleksii/.claude/agents/SKILLS_MASTER_AGENT.xml</agent>
+    </agent_roles>
+
+    <note>
+        <task_preparation>
+            Prepare the task in a single document describing phases for all roles and create a subtask for the current
+            task.
+        </task_preparation>
+
+        <task_storage>
+            <location>@/Users/oleksii/.claude/agents/tasks</location>
+            <format>XML file</format>
+        </task_storage>
+
+        <kanban_integration>
+            After creating the task, create a task in vibe-kanban.
+        </kanban_integration>
+    </note>
+
+    <documentation_study>
+        <instruction>Study documentation before building tasks:</instruction>
+        <required_docs>
+            <doc>@/Users/oleksii/.claude/docs/why_are_you_gay.md</doc>
+            <doc>@/Users/oleksii/.claude/docs/prompting_best_practices.md</doc>
+            <doc>@/Users/oleksii/.claude/docs/prompt_engineering_overview.md</doc>
+            <doc>@/Users/oleksii/.claude/docs/use_xml_tags.md</doc>
+        </required_docs>
+        <skills_directory>@/Users/oleksii/.claude/skills</skills_directory>
+    </documentation_study>
+
+    <error_correction_phase>
+        <instruction>
+            At the end of task execution, add instructions for the agent to start the application.
+        </instruction>
+
+        <error_loop>
+            <step>If any errors occur, fix them and repeat the action until the application starts successfully.</step>
+            <step>After that, run tests and follow the same procedure.</step>
+        </error_loop>
+    </error_correction_phase>
+
+    <task>
+        <doc>@/Users/oleksii/.claude/docs/agent_skills.md</doc>
+        <doc>@/Users/oleksii/.claude/docs/agent_skills_overview.md</doc>
+        <doc>@/Users/oleksii/.claude/docs/agent_skills_quickstart.md</doc>
+        <doc>@/Users/oleksii/.claude/docs/skill_authoring_best_practices.md</doc>
+        <doc>@/Users/oleksii/.claude/docs/using_agent_skills_with_the_api.md</doc>
+        <do>
+            Вивчи документацію, яку я надав тобі вище, і на основі бест практіс побудуй скіли в /Users/oleksii/.claude/skills для агента, який будує скіли для проєктів.
+        </do>
+    </task>
+
+</task_manager_prompt>
