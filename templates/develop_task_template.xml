@@ -43,7 +43,7 @@
             <doc>~/Projects/Node/CrowdTamers/heyvail/CLAUDE.md</doc>
             <doc>~/Projects/Node/CrowdTamers/heyvail/README.md</doc>
         </required_docs>
-        <skills_directory>~/Projects/Node/CrowdTamers/heyvail/.claude/skills</skills_directory>
+        <skills_directory>~/.claude/skills</skills_directory>
     </documentation_study>
 
     <error_correction_phase>
