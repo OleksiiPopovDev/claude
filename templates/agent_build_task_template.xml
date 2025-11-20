@@ -10,7 +10,8 @@
 
         <task_preparation>
             Prepare the task in a single document describing phases for all roles and create a subtask for the current
-            task.
+            task in XML format.
+            <IMPORTANT>You must create detail describe XML task into @/Users/oleksii/.claude/tasks</IMPORTANT>
         </task_preparation>
 
         <task_storage>
@@ -41,45 +42,17 @@
     </documentation_study>
 
     <task>
-        Твоя задача: на основі драфту, промту, DevOps-агенту підготувати промт для агента DevOps для використання його в
-        розробці всіх застосунків сервісу.
-        /Users/oleksii/.claude/agents/DEVOPS_TELEMETRY_PROMPT_draft.md
+        Потрібно створити агента, який буде створювати і редагувати вже існуючих агентів.
 
-        Основний показовий сервіс, в якому більш-менш гарно налаштований DevOps процес з CI процесами, це ось цей.
-        /Users/oleksii/Projects/Node/CrowdTamers/ach-integration
-        /Users/oleksii/Projects/Node/CrowdTamers/ach-integration/.github
-        /Users/oleksii/Projects/Node/CrowdTamers/ach-integration/scripts/generate-env-from-vault.sh
-        /Users/oleksii/Projects/Node/CrowdTamers/ach-integration/docker-compose.yml
-        /Users/oleksii/Projects/Node/CrowdTamers/ach-integration/docker-compose.prod.yml
-        /Users/oleksii/Projects/Node/CrowdTamers/ach-integration/Dockerfile
+        Вивчи надану тобі документацію та вивчи вже створених агентів.
+        /Users/oleksii/.claude/agents/DEVOPS_MASTER_PROMPT.xml
+        /Users/oleksii/.claude/agents/SKILLS_MASTER_AGENT.xml
+        /Users/oleksii/.claude/agents/TASK_MANAGER_PROMPT.xml
+        /Users/oleksii/.claude/agents/TECHNICAL_LEAD_PROMPT.xml
 
-        Агент "DevOps Master" буде працювати з проєктами:
-        /Users/oleksii/Projects/Node/CrowdTamers/heyvail
-        /Users/oleksii/Projects/Node/CrowdTamers/heyvail-se966u
+        На основі вже створених агентів потрібно побудувати агента, який буде створювати промти для нових агентів або редагувати вже існуючі.
 
-        Олександр Сахаренко: Технології, які ми використовуємо в цьому проєкті, —
-
-        - OpenTelemetry (SigNoz)
-        - Laminar для heyvail-se966u
-        - Supabase
-        - Docker + k8s
-        - Vault
-        - GitHub + Actions
-        - Grafana
-        - NodeJS
-        - Python
-
-        Кожен проєкт, в якому застосовується цей агент, повинен мати підключення до SigNoz та трейси логи в OpenTelemetry
-        @/Users/oleksii/Projects/Node/CrowdTamers/heyvail/src/app/ship/telemetry
-
-        Вивчи цей стиль Action для GitHub /Users/oleksii/Projects/Node/CrowdTamers/ach-integration/.github та напиши інструкцію
-        для розгортання проектів на проді
-        Обовʼязково в проектах реалізуй скрипт роботи з Vault
-        @/Users/oleksii/Projects/Node/CrowdTamers/ach-integration/scripts/generate-env-from-vault.sh
-        Проекти може містити контейнери, вони повинні зберігатися в корені прокту в директорії docker/
-        CI/CD Після зборки проекту на прод сервері і запуску застосунку, .env файл повинен видалятися з серверу
-
-        Промпт ролі DevOps Master агент повинен бути написан в xml форматі
+        Використовуй скіли та контент агентів, які я вказав.
     </task>
 
 </task_manager_prompt>

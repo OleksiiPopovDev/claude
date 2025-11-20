@@ -154,6 +154,8 @@ After initialization, customize or remove the generated SKILL.md and example fil
 
 **Important**: Review [Anthropic Best Practices](references/anthropic-best-practices.md) and [YAML Validation Rules](references/yaml-validation.md) before proceeding to ensure compliance with all requirements.
 
+**For project-specific Skills**: See [Project-Specific Skills Guide](references/project-specific-skills.md) for guidance on creating Skills tailored to a particular project's patterns and workflows.
+
 ### Step 4: Edit the Skill
 
 When editing the (newly-generated or existing) skill, remember that the skill is being created for another instance of Claude to use. Focus on including information that would be beneficial and non-obvious to Claude. Consider what procedural knowledge, domain-specific details, or reusable assets would help another Claude instance execute these tasks more effectively.
@@ -206,6 +208,8 @@ Create minimum 3 evaluations per Skill to verify effectiveness:
 3. Edge case/error handling scenario
 
 See [Evaluation Structure](references/evaluation-structure.md) for complete evaluation format and best practices.
+
+**For project-specific Skills**: Use actual project scenarios and real file names from the project in evaluations to ensure Skills work with genuine project patterns.
 
 #### Quick Validation (Legacy)
 
