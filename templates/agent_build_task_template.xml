@@ -1,54 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <task_manager_prompt>
 
-    <your_role>@/Users/oleksii/.claude/agents/TASK_MANAGER_PROMPT.xml</your_role>
+    <your_role>@~/.claude/agents/TASK_MANAGER_PROMPT.xml</your_role>
 
     <instruction>
+        Prepare a task description for collaboration of the following roles in priority order:
+    </instruction>
+
+    <agent_roles priority_order="true">
+        <agent priority="1">@~/.claude/agents/AGENT_BUILDER_PROMPT.xml
+        </agent>
+    </agent_roles>
+
+    <note>
         <mcp_qwen>Always use Qwen/Qwen2.5-Coder-32B-Instruct for build prompts</mcp_qwen>
-
         <mcp_octocode>Always use Octocode for navigation by projects</mcp_octocode>
-
         <task_preparation>
             Prepare the task in a single document describing phases for all roles and create a subtask for the current
-            task in XML format.
-            <IMPORTANT>You must create detail describe XML task into @/Users/oleksii/.claude/tasks</IMPORTANT>
+            task.
         </task_preparation>
 
         <task_storage>
-            <location>@/Users/oleksii/.claude/tasks</location>
+            <location>@~/Projects/Node/CrowdTamers/heyvail/.claude/tasks</location>
             <format>XML file</format>
         </task_storage>
-
-        <agent_storage>
-            <location>@/Users/oleksii/.claude/agents</location>
-            <format>XML file</format>
-        </agent_storage>
 
         <kanban_integration>
             After creating the task, create a task in vibe-kanban.
         </kanban_integration>
-    </instruction>
+    </note>
 
     <documentation_study>
         <instruction>Study documentation before building tasks:</instruction>
         <required_docs>
-            <doc>@/Users/oleksii/.claude/docs/why_are_you_gay.md</doc>
-            <doc>@/Users/oleksii/.claude/docs/prompting_best_practices.md</doc>
-            <doc>@/Users/oleksii/.claude/docs/prompt_engineering_overview.md</doc>
-            <doc>@/Users/oleksii/.claude/docs/use_xml_tags.md</doc>
-            <doc>@/Users/oleksii/.claude/docs/giving_claude_a_role_with_a_system_prompt.md</doc>
+            <doc>@~/.claude/docs/why_are_you_gay.md</doc>
+            <doc>@~/.claude/docs/prompting_best_practices.md</doc>
+            <doc>@~/.claude/docs/prompt_engineering_overview.md</doc>
+            <doc>@~/.claude/docs/use_xml_tags.md</doc>
+            <doc>@~/.claude/docs/giving_claude_a_role_with_a_system_prompt.md</doc>
         </required_docs>
-        <skills_directory>@/Users/oleksii/.claude/skills</skills_directory>
+        <skills_directory>@~/.claude/skills</skills_directory>
     </documentation_study>
 
     <task>
         Потрібно створити агента, який буде створювати і редагувати вже існуючих агентів.
 
         Вивчи надану тобі документацію та вивчи вже створених агентів.
-        /Users/oleksii/.claude/agents/DEVOPS_MASTER_PROMPT.xml
-        /Users/oleksii/.claude/agents/SKILLS_MASTER_AGENT.xml
-        /Users/oleksii/.claude/agents/TASK_MANAGER_PROMPT.xml
-        /Users/oleksii/.claude/agents/TECHNICAL_LEAD_PROMPT.xml
+        ~/.claude/agents/DEVOPS_MASTER_PROMPT.xml
+        ~/.claude/agents/SKILLS_MASTER_AGENT.xml
+        ~/.claude/agents/TASK_MANAGER_PROMPT.xml
+        ~/.claude/agents/TECHNICAL_LEAD_PROMPT.xml
 
         На основі вже створених агентів потрібно побудувати агента, який буде створювати промти для нових агентів або редагувати вже існуючі.
 

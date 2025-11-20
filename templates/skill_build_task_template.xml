@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <task_manager_prompt>
 
-    <your_role>@/Users/oleksii/.claude/agents/TASK_MANAGER_PROMPT.xml</your_role>
+    <your_role>@~/.claude/agents/TASK_MANAGER_PROMPT.xml</your_role>
 
     <instruction>
         Prepare a task description for collaboration of the following roles in priority order:
     </instruction>
 
     <agent_roles priority_order="true">
-        <agent priority="1">@/Users/oleksii/.claude/agents/SKILLS_MASTER_AGENT.xml</agent>
+        <agent priority="1">@~/.claude/agents/SKILLS_MASTER_AGENT.xml</agent>
     </agent_roles>
 
     <note>
@@ -18,7 +18,7 @@
         </task_preparation>
 
         <task_storage>
-            <location>@/Users/oleksii/.claude/tasks</location>
+            <location>@~/.claude/tasks</location>
             <format>XML file</format>
         </task_storage>
 
@@ -30,12 +30,12 @@
     <documentation_study>
         <instruction>Study documentation before building tasks:</instruction>
         <required_docs>
-            <doc>@/Users/oleksii/.claude/docs/why_are_you_gay.md</doc>
-            <doc>@/Users/oleksii/.claude/docs/prompting_best_practices.md</doc>
-            <doc>@/Users/oleksii/.claude/docs/prompt_engineering_overview.md</doc>
-            <doc>@/Users/oleksii/.claude/docs/use_xml_tags.md</doc>
+            <doc>@~/.claude/docs/why_are_you_gay.md</doc>
+            <doc>@~/.claude/docs/prompting_best_practices.md</doc>
+            <doc>@~/.claude/docs/prompt_engineering_overview.md</doc>
+            <doc>@~/.claude/docs/use_xml_tags.md</doc>
         </required_docs>
-        <skills_directory>@/Users/oleksii/.claude/skills</skills_directory>
+        <skills_directory>@~/.claude/skills</skills_directory>
     </documentation_study>
 
     <error_correction_phase>
@@ -50,13 +50,13 @@
     </error_correction_phase>
 
     <task>
-        <doc>@/Users/oleksii/.claude/docs/agent_skills.md</doc>
-        <doc>@/Users/oleksii/.claude/docs/agent_skills_overview.md</doc>
-        <doc>@/Users/oleksii/.claude/docs/agent_skills_quickstart.md</doc>
-        <doc>@/Users/oleksii/.claude/docs/skill_authoring_best_practices.md</doc>
-        <doc>@/Users/oleksii/.claude/docs/using_agent_skills_with_the_api.md</doc>
+        <doc>@~/.claude/docs/agent_skills.md</doc>
+        <doc>@~/.claude/docs/agent_skills_overview.md</doc>
+        <doc>@~/.claude/docs/agent_skills_quickstart.md</doc>
+        <doc>@~/.claude/docs/skill_authoring_best_practices.md</doc>
+        <doc>@~/.claude/docs/using_agent_skills_with_the_api.md</doc>
         <do>
-            Вивчи документацію, яку я надав тобі вище, і на основі бест практіс побудуй скіли в /Users/oleksii/.claude/skills для агента, який будує скіли для проєктів.
+            Вивчи документацію, яку я надав тобі вище, і на основі бест практіс побудуй скіли в ~/.claude/skills для агента, який будує скіли для проєктів.
         </do>
     </task>
 
