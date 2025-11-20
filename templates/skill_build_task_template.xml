@@ -50,14 +50,7 @@
     </error_correction_phase>
 
     <task>
-        <doc>@~/.claude/docs/agent_skills.md</doc>
-        <doc>@~/.claude/docs/agent_skills_overview.md</doc>
-        <doc>@~/.claude/docs/agent_skills_quickstart.md</doc>
-        <doc>@~/.claude/docs/skill_authoring_best_practices.md</doc>
-        <doc>@~/.claude/docs/using_agent_skills_with_the_api.md</doc>
-        <do>
-            Вивчи документацію, яку я надав тобі вище, і на основі бест практіс побудуй скіли в ~/.claude/skills для агента, який будує скіли для проєктів.
-        </do>
+
     </task>
 
 </task_manager_prompt>

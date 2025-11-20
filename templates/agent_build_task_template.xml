@@ -43,17 +43,7 @@
     </documentation_study>
 
     <task>
-        Потрібно створити агента, який буде створювати і редагувати вже існуючих агентів.
 
-        Вивчи надану тобі документацію та вивчи вже створених агентів.
-        ~/.claude/agents/DEVOPS_MASTER_PROMPT.xml
-        ~/.claude/agents/SKILLS_MASTER_AGENT.xml
-        ~/.claude/agents/TASK_MANAGER_PROMPT.xml
-        ~/.claude/agents/TECHNICAL_LEAD_PROMPT.xml
-
-        На основі вже створених агентів потрібно побудувати агента, який буде створювати промти для нових агентів або редагувати вже існуючі.
-
-        Використовуй скіли та контент агентів, які я вказав.
     </task>
 
 </task_manager_prompt>
