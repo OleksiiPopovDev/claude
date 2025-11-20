@@ -18,7 +18,7 @@
         </task_preparation>
 
         <task_storage>
-            <location>@~/.claude/tasks</location>
+            <location>@.claude/tasks</location>
             <format>XML file</format>
         </task_storage>
 
@@ -36,6 +36,7 @@
             <doc>@~/.claude/docs/use_xml_tags.md</doc>
         </required_docs>
         <skills_directory>@~/.claude/skills</skills_directory>
+        <skills_directory>@.claude/skills</skills_directory>
     </documentation_study>
 
     <error_correction_phase>

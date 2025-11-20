@@ -8,16 +8,10 @@
     </instruction>
 
     <agent_roles priority_order="true">
-        <agent priority="1">@~/Projects/Node/CrowdTamers/heyvail/.claude/agents/TECHNICAL_LEAD_PROMPT.md
-        </agent>
-        <agent priority="2">
-            @~/Projects/Node/CrowdTamers/heyvail/.claude/agents/LOGGER_INSPECTOR_PROMPT.md
-        </agent>
-        <agent priority="3">@~/Projects/Node/CrowdTamers/heyvail/.claude/agents/QA_ENGINEER_PROMPT.md
-        </agent>
-        <agent priority="4">
-            @~/Projects/Node/CrowdTamers/heyvail/.claude/agents/ANALYZE_AND_CLEAN_CODE_PROMPT.md
-        </agent>
+        <agent priority="1">@~/.claude/agents/TECHNICAL_LEAD_PROMPT.xml</agent>
+        <agent priority="2">@~/.claude/agents/LOGGER_INSPECTOR_PROMPT.xml</agent>
+        <agent priority="3">@~/.claude/agents/QA_ENGINEER_PROMPT.xml</agent>
+        <agent priority="4">@~/.claude/agents/ANALYZE_AND_CLEAN_CODE_PROMPT.xml</agent>
         <agent priority="5">@~/.claude/agents/SKILLS_MASTER_AGENT.xml</agent>
     </agent_roles>
 
@@ -28,7 +22,7 @@
         </task_preparation>
 
         <task_storage>
-            <location>@~/Projects/Node/CrowdTamers/heyvail/.claude/tasks</location>
+            <location>@.claude/tasks</location>
             <format>XML file</format>
         </task_storage>
 
@@ -40,10 +34,11 @@
     <documentation_study>
         <instruction>Study documentation before building tasks:</instruction>
         <required_docs>
-            <doc>~/Projects/Node/CrowdTamers/heyvail/CLAUDE.md</doc>
-            <doc>~/Projects/Node/CrowdTamers/heyvail/README.md</doc>
+            <doc>@CLAUDE.md</doc>
+            <doc>@README.md</doc>
         </required_docs>
-        <skills_directory>~/.claude/skills</skills_directory>
+        <skills_directory>@~/.claude/skills</skills_directory>
+        <skills_directory>@.claude/skills</skills_directory>
     </documentation_study>
 
     <error_correction_phase>

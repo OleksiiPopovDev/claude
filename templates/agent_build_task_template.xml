@@ -21,7 +21,7 @@
         </task_preparation>
 
         <task_storage>
-            <location>@~/.claude/tasks</location>
+            <location>@.claude/tasks</location>
             <format>XML file</format>
         </task_storage>
 
@@ -40,11 +40,11 @@
             <doc>@~/.claude/docs/giving_claude_a_role_with_a_system_prompt.md</doc>
         </required_docs>
         <skills_directory>@~/.claude/skills</skills_directory>
+        <skills_directory>@.claude/skills</skills_directory>
     </documentation_study>
 
     <task>
-        @/Users/oleksii/.claude/agents/GIT_MASTER_PROMPT.xml
-        This role needs additional rules. The agent must not add any authorship or mention that the code was written by an AI agent in commits. Each commit must contain only the types of changes based on what was actually done. Furthermore, if the agent is used to perform tasks in collaboration with other agents, it must analyze the changes made by those agents and, based on those changes, update the documentation and update the project skills where it is being used.
+
     </task>
 
 </task_manager_prompt>
