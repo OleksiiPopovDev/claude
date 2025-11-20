@@ -30,16 +30,16 @@ model: claude-opus-4-1-20250805
 // Good: Early return without else
 async execute(userId: string): Promise<User> {
     const user = await this.userRepository.findById(userId);
-
+    
     if (!user) {
         throw new UserNotFoundException(userId);
     }
-
+    
     // Main logic continues here without else
     if (!user.isActive()) {
         throw new InactiveUserException(userId);
     }
-
+    
     // Process active user
     return this.processUser(user);
 }
@@ -52,7 +52,7 @@ async execute(userId: string): Promise<User> {
 // Bad: Using else after return
 async execute(userId: string): Promise<User> {
     const user = await this.userRepository.findById(userId);
-
+    
     if (!user) {
         throw new UserNotFoundException(userId);
     } else {  // ❌ Unnecessary else
@@ -87,7 +87,7 @@ export class CreateUserAction {
         private readonly createUserTask: CreateUserTask,
         private readonly logger: LoggerService,
     ) {}
-
+    
     async execute(request: CreateUserRequest): Promise<UserResponse> {
         try {
             const user = await this.createUserTask.execute(request);
@@ -99,16 +99,16 @@ export class CreateUserAction {
                 error: error.message,
                 stack: error.stack,
             });
-
+            
             // Transform to appropriate HTTP exception
             if (error instanceof EmailAlreadyExistsException) {
                 throw new ConflictException(error.message);
             }
-
+            
             if (error instanceof ValidationException) {
                 throw new BadRequestException(error.message);
             }
-
+            
             // Default error handling
             throw new InternalServerErrorException('Failed to create user');
         }
@@ -123,13 +123,13 @@ export class CreateUserTask {
         if (!this.isValidEmail(data.email)) {
             throw new InvalidEmailException(data.email);
         }
-
+        
         // Check business constraints
         const existingUser = await this.userRepository.findByEmail(data.email);
         if (existingUser) {
             throw new EmailAlreadyExistsException(data.email);
         }
-
+        
         // Create user - let exceptions propagate
         return this.userRepository.create(data);
     }
@@ -207,7 +207,7 @@ export class UserRepository {
         @InjectRepository(User)
         private readonly repository: Repository<User>,
     ) {}
-
+    
     // Pure data access - find operation
     async findById(id: string): Promise<User | null> {
         return this.repository.findOne({
@@ -215,19 +215,19 @@ export class UserRepository {
             relations: ['profile', 'subscriptions']
         });
     }
-
+    
     // Pure data access - create operation
     async create(userData: Partial<User>): Promise<User> {
         const user = this.repository.create(userData);
         return this.repository.save(user);
     }
-
+    
     // Pure data access - update operation
     async update(id: string, updates: Partial<User>): Promise<User> {
         await this.repository.update(id, updates);
         return this.findById(id);
     }
-
+    
     // Pure data access - complex query
     async findActiveUsersWithExpiredSubscriptions(): Promise<User[]> {
         return this.repository
@@ -251,15 +251,15 @@ export class UserRepository {
         if (!this.isValidEmail(userData.email)) {
             throw new InvalidEmailException();
         }
-
+        
         // ❌ Business rule checking
         if (userData.age < 18) {
             throw new UnderageUserException();
         }
-
+        
         const user = this.repository.create(userData);
         const savedUser = await this.repository.save(user);
-
+        
         // ❌ Data transformation/mapping
         return {
             id: savedUser.id,
@@ -268,24 +268,24 @@ export class UserRepository {
             isVip: savedUser.purchases > 10  // ❌ Business logic
         };
     }
-
+    
     // ❌ External service call in repository
     async createAndNotify(userData: Partial<User>): Promise<User> {
         const user = await this.create(userData);
-
+        
         // ❌ External service calls don't belong in repositories
         await this.emailService.sendWelcomeEmail(user.email);
         await this.eventBus.emit('user.created', user);
-
+        
         return user;
     }
-
+    
     // ❌ Caching logic in repository
     async findByIdWithCache(id: string): Promise<User> {
         // ❌ Caching should be handled at a higher layer
         const cached = await this.cache.get(`user:${id}`);
         if (cached) return cached;
-
+        
         const user = await this.findById(id);
         await this.cache.set(`user:${id}`, user);
         return user;
@@ -298,6 +298,29 @@ export class UserRepository {
 
     <critical_code_organization_rule>
         <rule>MANDATORY: Every TypeScript file MUST contain exactly ONE primary export (class, interface, DTO, entity, enum, etc.). This rule is NON-NEGOTIABLE and applies to ALL code files.</rule>
+
+        <interface_separation_rules>
+            <rule priority="CRITICAL">Interfaces MUST be separated from implementation classes</rule>
+            <rule priority="CRITICAL">Each interface MUST be in its own file in the container's interfaces/ directory</rule>
+            <rule priority="CRITICAL">Action/Task interfaces for input/output types MUST be extracted to separate files</rule>
+            <rule priority="CRITICAL">Even tightly coupled interfaces MUST be in separate files</rule>
+
+            <directory_structure>
+                <![CDATA[
+container/
+├── actions/
+│   ├── create-user.action.ts           # ONLY the Action class
+│   └── subactions/
+├── tasks/
+│   └── validate-user.task.ts           # ONLY the Task class
+├── interfaces/
+│   ├── create-user-input.interface.ts  # Input interface for Action
+│   ├── create-user-result.interface.ts # Result interface for Action
+│   ├── file-upload-attempt.interface.ts # Interface for file upload tracking
+│   └── validation-result.interface.ts  # Interface for Task results
+        ]]>
+            </directory_structure>
+        </interface_separation_rules>
 
         <correct_examples>
             <example>
@@ -340,13 +363,21 @@ export enum UserStatus {
             </example>
 
             <example>
-                <file>user.types.ts - ONLY type definitions (exception for related types)</file>
+                <file>interfaces/upload-result.interface.ts - ONLY interface</file>
                 <code><![CDATA[
-export interface UserData {
-    id: string;
-    name: string;
+export interface UploadResult {
+    success: boolean;
+    uploadId?: string;
+    errorMessage?: string;
 }
+        ]]></code>
+            </example>
 
+            <example>
+                <file>user.types.ts - ONLY type definitions (exception for closely related simple types)</file>
+                <code><![CDATA[
+// Exception: Only for simple, closely related type aliases
+export type UserId = string;
 export type UserRole = 'admin' | 'user' | 'moderator';
         ]]></code>
             </example>
@@ -360,6 +391,53 @@ export class User {}
 export class UserProfile {}
 export class UserSettings {}
         ]]></code>
+            </example>
+
+            <example>
+                <title>NEVER - Interfaces and classes in the same file</title>
+                <code><![CDATA[
+// ❌ WRONG - upload-file.action.ts with interfaces and class together
+export interface FileUploadAttempt {
+    filename: string;
+    uploadSuccess: boolean;
+    errorMessage?: string;
+}
+
+export interface UploadResult {
+    success: boolean;
+    attempts: FileUploadAttempt[];
+}
+
+@Injectable()
+export class UploadFileAction {
+    // Action implementation
+}
+        ]]></code>
+                <correct_approach><![CDATA[
+// ✅ CORRECT - Separate files:
+
+// interfaces/file-upload-attempt.interface.ts
+export interface FileUploadAttempt {
+    filename: string;
+    uploadSuccess: boolean;
+    errorMessage?: string;
+}
+
+// interfaces/upload-result.interface.ts
+export interface UploadResult {
+    success: boolean;
+    attempts: FileUploadAttempt[];
+}
+
+// actions/upload-file.action.ts
+import { FileUploadAttempt } from '../interfaces/file-upload-attempt.interface';
+import { UploadResult } from '../interfaces/upload-result.interface';
+
+@Injectable()
+export class UploadFileAction {
+    // Action implementation
+}
+        ]]></correct_approach>
             </example>
 
             <example>
@@ -593,10 +671,13 @@ export interface OrderData {}
                 <rule>Injectable Service: Use `@Injectable()` decorator for dependency injection</rule>
                 <rule>SubActions: For complex orchestrations, use SubActions in `actions/subactions/` directory</rule>
                 <rule>One Class Per File: Each Action MUST be in its own file</rule>
+                <rule>Interface Separation: Input/Output interfaces MUST be in separate files in `interfaces/` directory</rule>
+                <rule>NO Interfaces in Action Files: Action files contain ONLY the Action class, no interfaces</rule>
             </rules>
             <example>
-                <title>CORRECT: create-user.action.ts - Single Action class</title>
+                <title>CORRECT: create-user.action.ts - Single Action class WITHOUT interfaces</title>
                 <code><![CDATA[
+// Import interfaces from separate files
 import { Injectable } from '@nestjs/common';
 import { ValidateUserDataTask } from '../tasks/validate-user-data.task';
 import { CheckEmailAvailabilityTask } from '../tasks/check-email-availability.task';
@@ -605,6 +686,9 @@ import { SendWelcomeEmailSubAction } from './subactions/send-welcome-email.subac
 import { CreateUserRequest } from '../ui/http/requests/create-user.request';
 import { UserResponse } from '../ui/http/responses/user.response';
 import { UserTransformer } from '../ui/http/transformers/user.transformer';
+// Import Action-specific interfaces from interfaces directory
+import { CreateUserInput } from '../interfaces/create-user-input.interface';
+import { CreateUserResult } from '../interfaces/create-user-result.interface';
 
 @Injectable()
 export class CreateUserAction {
@@ -615,20 +699,20 @@ export class CreateUserAction {
         private readonly sendWelcomeEmailSubAction: SendWelcomeEmailSubAction,
         private readonly userTransformer: UserTransformer,
     ) {}
-
+    
     async execute(request: CreateUserRequest): Promise<UserResponse> {
         // Step 1: Validate business rules
         const validatedData = await this.validateUserDataTask.execute(request);
-
+        
         // Step 2: Check domain constraints
         await this.checkEmailAvailabilityTask.execute(validatedData.email);
-
+        
         // Step 3: Execute core business logic
         const user = await this.createUserTask.execute(validatedData);
-
+        
         // Step 4: Handle side effects using SubAction
         await this.sendWelcomeEmailSubAction.execute(user);
-
+        
         // Step 5: Transform response
         return this.userTransformer.transform(user);
     }
@@ -662,7 +746,7 @@ export class SendWelcomeEmailSubAction {
         private readonly createNotificationTask: CreateNotificationTask,
         private readonly logUserActivityTask: LogUserActivityTask,
     ) {}
-
+    
     async execute(user: User): Promise<void> {
         // Step 1: Send welcome email
         await this.sendEmailTask.execute({
@@ -670,14 +754,14 @@ export class SendWelcomeEmailSubAction {
             template: 'user-welcome',
             data: { name: user.name }
         });
-
+        
         // Step 2: Create in-app notification
         await this.createNotificationTask.execute({
             userId: user.id,
             type: 'welcome',
             message: `Welcome to our platform, ${user.name}!`
         });
-
+        
         // Step 3: Log activity
         await this.logUserActivityTask.execute({
             userId: user.id,
@@ -698,28 +782,26 @@ export class SendWelcomeEmailSubAction {
                 <rule>Reusable: Tasks can be called by multiple Actions and SubActions</rule>
                 <rule>Injectable Service: Use `@Injectable()` decorator</rule>
                 <rule>One Class Per File: Each Task MUST be in its own file</rule>
+                <rule>Interface Separation: Input/Output interfaces MUST be in separate files in `interfaces/` directory</rule>
+                <rule>NO Interfaces in Task Files: Task files contain ONLY the Task class</rule>
             </rules>
             <example>
-                <title>CORRECT: calculate-user-subscription-price.task.ts - Single Task class</title>
+                <title>CORRECT: calculate-user-subscription-price.task.ts - Single Task class WITHOUT interfaces</title>
                 <code><![CDATA[
 import { Injectable } from '@nestjs/common';
 import { User } from '../entities/user.entity';
 import { SubscriptionPlan } from '../entities/subscription-plan.entity';
 import { PricingRepository } from '../data/repositories/pricing.repository';
 import { PricingResult } from '../values/pricing-result.value';
-
-export interface CalculatePricingData {
-    userId: string;
-    planId: string;
-    region: string;
-}
+// Import Task-specific interface from interfaces directory
+import { CalculatePricingData } from '../interfaces/calculate-pricing-data.interface';
 
 @Injectable()
 export class CalculateUserSubscriptionPriceTask {
     constructor(
         private readonly pricingRepository: PricingRepository,
     ) {}
-
+    
     async execute(data: CalculatePricingData): Promise<PricingResult> {
         // Business logic implementation...
         const [user, plan, basePricing] = await Promise.all([
@@ -727,14 +809,14 @@ export class CalculateUserSubscriptionPriceTask {
             this.getPlanById(data.planId),
             this.pricingRepository.findByPlan(data.planId),
         ]);
-
+        
         // Apply business rules
         const loyaltyDiscount = this.calculateLoyaltyDiscount(user);
         const seasonalMultiplier = this.calculateSeasonalRate();
         const regionMultiplier = this.getRegionalPricing(data.region);
-
+        
         const finalPrice = (basePricing.amount * seasonalMultiplier * regionMultiplier) - loyaltyDiscount;
-
+        
         return new PricingResult({
             basePrice: basePricing.amount,
             loyaltyDiscount,
@@ -743,15 +825,26 @@ export class CalculateUserSubscriptionPriceTask {
             finalPrice,
         });
     }
-
+    
     private calculateLoyaltyDiscount(user: User): number {
         // Business rule implementation...
     }
-
+    
     // Other private methods...
 }
         ]]></code>
             </example>
+            <interface_example>
+                <title>CORRECT: interfaces/calculate-pricing-data.interface.ts - Separate interface file</title>
+                <code><![CDATA[
+// This interface is in a SEPARATE file in the interfaces directory
+export interface CalculatePricingData {
+    userId: string;
+    planId: string;
+    region: string;
+}
+        ]]></code>
+            </interface_example>
         </tasks>
 
         <entities>
@@ -771,46 +864,46 @@ import { Subscription } from './subscription.entity';
 export class User {
     @PrimaryGeneratedColumn('uuid')
     id: string;
-
+    
     @Column({ type: 'varchar', length: 255 })
     name: string;
-
+    
     @Column({ type: 'varchar', length: 255, unique: true })
     email: string;
-
+    
     @Column({ type: 'varchar', length: 255 })
     password: string;
-
+    
     @Column({ type: 'timestamp', nullable: true })
     subscriptionExpiresAt: Date | null;
-
+    
     @Column({ type: 'timestamp', nullable: true })
     emailVerifiedAt: Date | null;
-
+    
     @CreateDateColumn()
     createdAt: Date;
-
+    
     @UpdateDateColumn()
     updatedAt: Date;
-
+    
     @OneToMany(() => Subscription, subscription => subscription.user)
     subscriptions: Subscription[];
-
+    
     // Domain methods
     isSubscriptionActive(): boolean {
         return this.subscriptionExpiresAt && this.subscriptionExpiresAt > new Date();
     }
-
+    
     canAccessPremiumFeatures(): boolean {
         return this.isSubscriptionActive() && !!this.emailVerifiedAt;
     }
-
+    
     getAccountAge(): number {
         const now = new Date();
         const diffTime = Math.abs(now.getTime() - this.createdAt.getTime());
         return Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // days
     }
-
+    
     isNewUser(): boolean {
         return this.getAccountAge() <= 30; // 30 days
     }
@@ -842,26 +935,26 @@ export class UserRepository {
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
     ) {}
-
+    
     async findById(id: string): Promise<User | null> {
         return this.userRepository.findOne({
             where: { id },
             relations: ['subscriptions']
         });
     }
-
+    
     async findByEmail(email: string): Promise<User | null> {
         return this.userRepository.findOne({
             where: { email },
             relations: ['subscriptions']
         });
     }
-
+    
     async create(userData: Partial<User>): Promise<User> {
         const user = this.userRepository.create(userData);
         return this.userRepository.save(user);
     }
-
+    
     // Other repository methods...
 }
         ]]></code>
@@ -887,11 +980,11 @@ export class CreateUserRequest {
     @MinLength(2)
     @MaxLength(100)
     name: string;
-
+    
     @ApiProperty({ description: 'User email address', example: 'john@example.com' })
     @IsEmail()
     email: string;
-
+    
     @ApiProperty({ description: 'User password', example: 'securePassword123' })
     @IsString()
     @MinLength(8)
@@ -908,16 +1001,16 @@ import { ApiProperty } from '@nestjs/swagger';
 export class UserResponse {
     @ApiProperty({ description: 'User unique identifier' })
     id: string;
-
+    
     @ApiProperty({ description: 'User full name' })
     name: string;
-
+    
     @ApiProperty({ description: 'User email address' })
     email: string;
-
+    
     @ApiProperty({ description: 'User creation timestamp' })
     createdAt: string;
-
+    
     @ApiProperty({ description: 'Whether user has active subscription' })
     hasActiveSubscription: boolean;
 }
@@ -961,9 +1054,47 @@ export enum SubscriptionPlan {
             <purpose>Define contracts and data structures.</purpose>
             <rules>
                 <rule>One Primary Interface Per File: Each main interface MUST be in its own file</rule>
-                <rule>Related Types Exception: Only closely related types can be in the same file</rule>
+                <rule>NO Interfaces in Implementation Files: Interfaces MUST NOT be in the same file as classes</rule>
+                <rule>Container Isolation: Interfaces live in the container's `interfaces/` directory</rule>
+                <rule>Action/Task Interfaces: Input/Output interfaces for Actions and Tasks MUST be separate files</rule>
+                <rule>Related Types Exception: ONLY simple, tightly related types can be in the same interface file</rule>
                 <rule>Clear Naming: Use descriptive names ending with .interface.ts</rule>
             </rules>
+            <strict_separation_examples>
+                <example>
+                    <title>❌ WRONG: Interface in Action file</title>
+                    <code><![CDATA[
+// upload-files.action.ts - VIOLATION
+export interface FileUploadResult {
+    success: boolean;
+    uploadId: string;
+}
+
+@Injectable()
+export class UploadFilesAction {
+    // Action implementation
+}
+          ]]></code>
+                </example>
+                <example>
+                    <title>✅ CORRECT: Interface in separate file</title>
+                    <code><![CDATA[
+// interfaces/file-upload-result.interface.ts
+export interface FileUploadResult {
+    success: boolean;
+    uploadId: string;
+}
+
+// actions/upload-files.action.ts
+import { FileUploadResult } from '../interfaces/file-upload-result.interface';
+
+@Injectable()
+export class UploadFilesAction {
+    // Action implementation
+}
+          ]]></code>
+                </example>
+            </strict_separation_examples>
             <examples>
                 <example>
                     <title>CORRECT: user-data.interface.ts - Single primary interface</title>
@@ -978,14 +1109,14 @@ export interface UserData {
           ]]></code>
                 </example>
                 <example>
-                    <title>CORRECT: payment-gateway.interface.ts - Single primary interface</title>
+                    <title>CORRECT: payment-gateway.interface.ts - Primary interface with related result types</title>
                     <code><![CDATA[
 export interface PaymentGateway {
     processPayment(amount: number, currency: string): Promise<PaymentResult>;
     refundPayment(transactionId: string): Promise<RefundResult>;
 }
 
-// Related interfaces can be in the same file
+// Exception: Result interfaces tightly coupled to primary interface can be in same file
 export interface PaymentResult {
     success: boolean;
     transactionId: string;
@@ -999,30 +1130,74 @@ export interface RefundResult {
 }
           ]]></code>
                 </example>
+                <example>
+                    <title>CORRECT: separate-action-interfaces.example</title>
+                    <code><![CDATA[
+// interfaces/file-upload-attempt.interface.ts
+export interface FileUploadAttempt {
+    filename: string;
+    filePath: string;
+    uploadSuccess: boolean;
+    fileDeleted: boolean;
+    uploadId?: string;
+    uploadStatus?: string;
+    errorMessage?: string;
+    errorCode?: string;
+    uploadDurationMs: number;
+}
+
+// interfaces/upload-local-files-result.interface.ts
+import { FileUploadAttempt } from './file-upload-attempt.interface';
+
+export interface UploadLocalFilesResult {
+    success: boolean;
+    directory: string;
+    totalFiles: number;
+    filesUploaded: number;
+    filesFailed: number;
+    attempts: FileUploadAttempt[];
+    durationMs: number;
+}
+
+// actions/upload-local-files.action.ts
+import { Injectable } from '@nestjs/common';
+import { FileUploadAttempt } from '../interfaces/file-upload-attempt.interface';
+import { UploadLocalFilesResult } from '../interfaces/upload-local-files-result.interface';
+
+@Injectable()
+export class UploadLocalFilesAction {
+    async execute(directory: string): Promise<UploadLocalFilesResult> {
+        // Implementation
+    }
+}
+          ]]></code>
+                </example>
             </examples>
         </interfaces>
     </component_responsibilities_and_design_principles>
 
     <key_success_criteria>
         <criterion priority="1">ONE CLASS/INTERFACE/DTO/ENTITY PER FILE - MANDATORY</criterion>
-        <criterion priority="2">Early return pattern - no else after return statements</criterion>
-        <criterion priority="3">Exception handling ONLY in Actions/SubActions with proper logging</criterion>
-        <criterion priority="4">Repositories contain ONLY data access logic - no business logic or transformations</criterion>
-        <criterion priority="5">Containers are logically organized by business domains</criterion>
-        <criterion priority="6">All business logic resides in Tasks, Actions only orchestrate</criterion>
-        <criterion priority="7">SubActions used for complex orchestration within containers</criterion>
-        <criterion priority="8">Repository isolation - each container has its own repositories</criterion>
-        <criterion priority="9">No interface wrappers for simple repository classes</criterion>
-        <criterion priority="10">Proper use of NestJS dependency injection throughout</criterion>
-        <criterion priority="11">TypeORM entities with domain behavior methods</criterion>
-        <criterion priority="12">Request/Response DTOs with class-validator validation</criterion>
-        <criterion priority="13">Event-driven communication between containers</criterion>
-        <criterion priority="14">Comprehensive testing (unit, integration, e2e)</criterion>
-        <criterion priority="15">Swagger API documentation</criterion>
-        <criterion priority="16">Custom exceptions with proper HTTP status codes</criterion>
-        <criterion priority="17">Value objects for domain primitives</criterion>
-        <criterion priority="18">Configuration management with environment variables</criterion>
-        <criterion priority="19">Clear file naming conventions with appropriate suffixes</criterion>
+        <criterion priority="2">Interfaces MUST be in separate files in `interfaces/` directory - NO EXCEPTIONS</criterion>
+        <criterion priority="3">Early return pattern - no else after return statements</criterion>
+        <criterion priority="4">Exception handling ONLY in Actions/SubActions with proper logging</criterion>
+        <criterion priority="5">Repositories contain ONLY data access logic - no business logic or transformations</criterion>
+        <criterion priority="6">Containers are logically organized by business domains</criterion>
+        <criterion priority="7">All business logic resides in Tasks, Actions only orchestrate</criterion>
+        <criterion priority="8">SubActions used for complex orchestration within containers</criterion>
+        <criterion priority="9">Repository isolation - each container has its own repositories</criterion>
+        <criterion priority="10">No interface wrappers for simple repository classes</criterion>
+        <criterion priority="11">Proper use of NestJS dependency injection throughout</criterion>
+        <criterion priority="12">TypeORM entities with domain behavior methods</criterion>
+        <criterion priority="13">Request/Response DTOs with class-validator validation</criterion>
+        <criterion priority="14">Event-driven communication between containers</criterion>
+        <criterion priority="15">Comprehensive testing (unit, integration, e2e)</criterion>
+        <criterion priority="16">Swagger API documentation</criterion>
+        <criterion priority="17">Custom exceptions with proper HTTP status codes</criterion>
+        <criterion priority="18">Value objects for domain primitives</criterion>
+        <criterion priority="19">Configuration management with environment variables</criterion>
+        <criterion priority="20">Clear file naming conventions with appropriate suffixes</criterion>
+        <criterion priority="21">NO mixing of interfaces and classes in the same file</criterion>
     </key_success_criteria>
 
     <final_principles>
@@ -1032,20 +1207,22 @@ export interface RefundResult {
 
         <priorities>
             <priority level="1">ONE CLASS PER FILE - This is non-negotiable</priority>
-            <priority level="2">Early return pattern - avoid else after return for cleaner code</priority>
-            <priority level="3">Layer-appropriate exception handling - try-catch only in Actions/SubActions</priority>
-            <priority level="4">Pure data access repositories - no business logic or transformations</priority>
-            <priority level="5">TypeScript-first approach with strict typing</priority>
-            <priority level="6">Dependency injection for loose coupling</priority>
-            <priority level="7">Business logic isolation in Tasks</priority>
-            <priority level="8">Container repository isolation - no sharing between containers</priority>
-            <priority level="9">SubActions for complex orchestration within containers</priority>
-            <priority level="10">Clean API design with proper DTOs</priority>
-            <priority level="11">Comprehensive testing at all levels</priority>
-            <priority level="12">Configuration management for different environments</priority>
-            <priority level="13">Error handling with meaningful exceptions and proper logging</priority>
-            <priority level="14">Documentation with Swagger/OpenAPI</priority>
-            <priority level="15">Clear file naming conventions with descriptive suffixes</priority>
+            <priority level="2">Interface separation - ALL interfaces in separate files in interfaces/ directory</priority>
+            <priority level="3">Early return pattern - avoid else after return for cleaner code</priority>
+            <priority level="4">Layer-appropriate exception handling - try-catch only in Actions/SubActions</priority>
+            <priority level="5">Pure data access repositories - no business logic or transformations</priority>
+            <priority level="6">TypeScript-first approach with strict typing</priority>
+            <priority level="7">Dependency injection for loose coupling</priority>
+            <priority level="8">Business logic isolation in Tasks</priority>
+            <priority level="9">Container repository isolation - no sharing between containers</priority>
+            <priority level="10">SubActions for complex orchestration within containers</priority>
+            <priority level="11">Clean API design with proper DTOs</priority>
+            <priority level="12">Comprehensive testing at all levels</priority>
+            <priority level="13">Configuration management for different environments</priority>
+            <priority level="14">Error handling with meaningful exceptions and proper logging</priority>
+            <priority level="15">Documentation with Swagger/OpenAPI</priority>
+            <priority level="16">Clear file naming conventions with descriptive suffixes</priority>
+            <priority level="17">NO mixing of interfaces and implementation classes - maintain strict separation</priority>
         </priorities>
     </final_principles>
 </agent_prompt>

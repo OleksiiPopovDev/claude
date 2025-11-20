@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task_assignment>
+    <header>
+        <task_id>SKILLS-001</task_id>
+        <project_name>Agent Skills Development for Project Management System</project_name>
+        <target_agent_role>@/Users/oleksii/.claude/agents/SKILLS_MASTER_AGENT.xml</target_agent_role>
+        <priority>High</priority>
+        <dependencies>
+            <dependency>None (Initial task)</dependency>
+        </dependencies>
+        <collaboration_required>No</collaboration_required>
+        <estimated_duration>6-8 hours</estimated_duration>
+        <task_file>20-11-2025-[001]-build-project-skills.xml</task_file>
+    </header>
+
+    <objective>
+        <description>Build comprehensive, high-quality Agent Skills for the project following Anthropic's best practices, enabling Claude to work more effectively with project-specific patterns, workflows, and architectural conventions.</description>
+    </objective>
+
+    <context>
+        <description>The project uses Claude Code extensively for development tasks. By creating project-specific Skills based on the comprehensive documentation provided (agent_skills.md, agent_skills_overview.md, agent_skills_quickstart.md, skill_authoring_best_practices.md, using_agent_skills_with_the_api.md, prompting_best_practices.md, prompt_engineering_overview.md, use_xml_tags.md, and why_are_you_gay.md), we can significantly enhance Claude's effectiveness when working with this codebase.</description>
+    </context>
+
+    <repository_safety_requirements>
+        <requirement priority="critical">NO COMMITS: Do not commit any changes to the repository</requirement>
+        <requirement priority="critical">NO PUSHES: Do not push any changes to the repository</requirement>
+        <requirement priority="critical">LOCAL WORK ONLY: All changes must remain local</requirement>
+    </repository_safety_requirements>
+
+    <required_documentation_study>
+        <documentation_files>
+            <file path="@/Users/oleksii/.claude/docs/agent_skills.md">
+                Complete guide on creating, managing, and sharing Skills in Claude Code
+            </file>
+            <file path="@/Users/oleksii/.claude/docs/agent_skills_overview.md">
+                Overview of Agent Skills architecture, how they work across Claude products
+            </file>
+            <file path="@/Users/oleksii/.claude/docs/agent_skills_quickstart.md">
+                Quick start tutorial for creating first Skills with the API
+            </file>
+            <file path="@/Users/oleksii/.claude/docs/skill_authoring_best_practices.md">
+                Comprehensive best practices for writing effective Skills that Claude can use
+            </file>
+            <file path="@/Users/oleksii/.claude/docs/using_agent_skills_with_the_api.md">
+                Guide on using Skills with Claude API for programmatic access
+            </file>
+            <file path="@/Users/oleksii/.claude/docs/prompting_best_practices.md">
+                Claude 4.x specific prompting techniques and best practices
+            </file>
+            <file path="@/Users/oleksii/.claude/docs/prompt_engineering_overview.md">
+                Overview of prompt engineering approach before creating Skills
+            </file>
+            <file path="@/Users/oleksii/.claude/docs/use_xml_tags.md">
+                XML tags usage for structuring prompts and Skills
+            </file>
+            <file path="@/Users/oleksii/.claude/docs/why_are_you_gay.md">
+                Mandatory output rules, response guidelines, and change authorization process
+            </file>
+        </documentation_files>
+
+        <study_requirements>
+            <requirement>Read and internalize ALL documentation files listed above</requirement>
+            <requirement>Understand progressive disclosure architecture (3 levels of loading)</requirement>
+            <requirement>Master YAML frontmatter requirements and validation rules</requirement>
+            <requirement>Learn conciseness principles and context window optimization</requirement>
+            <requirement>Comprehend appropriate degrees of freedom for different task types</requirement>
+            <requirement>Understand evaluation-driven development approach</requirement>
+        </study_requirements>
+    </required_documentation_study>
+
+    <requirements>
+        <functional_requirements>
+            <requirement>Analyze project codebase structure and identify repeatable patterns</requirement>
+            <requirement>Create project-specific Skills in .claude/skills/ directory</requirement>
+            <requirement>Implement proper YAML frontmatter with name and description fields</requirement>
+            <requirement>Use progressive disclosure pattern (metadata → instructions → resources)</requirement>
+            <requirement>Create Skills with appropriate degrees of freedom based on task fragility</requirement>
+            <requirement>Bundle utility scripts for deterministic operations where applicable</requirement>
+            <requirement>Organize Skills with clear directory structure</requirement>
+            <requirement>Create Skills index documentation (README.md in skills directory)</requirement>
+        </functional_requirements>
+
+        <technical_requirements>
+            <requirement>YAML frontmatter must meet validation rules:
+                - name: max 64 chars, lowercase/numbers/hyphens only, no XML tags, no reserved words
+                - description: max 1024 chars, non-empty, no XML tags, third person, includes what AND when
+            </requirement>
+            <requirement>Keep SKILL.md body under 500 lines for optimal performance</requirement>
+            <requirement>Total Skill size under 8MB (all files combined)</requirement>
+            <requirement>Use forward slashes (/) in all file paths (Unix-style)</requirement>
+            <requirement>File references should be one level deep from SKILL.md</requirement>
+            <requirement>Use gerund form for Skill names (e.g., "processing-data", "testing-code")</requirement>
+            <requirement>Avoid time-sensitive information or use "old patterns" sections</requirement>
+            <requirement>Maintain consistent terminology throughout each Skill</requirement>
+        </technical_requirements>
+
+        <quality_standards>
+            <requirement>Follow "Concise is key" principle - assume Claude's intelligence</requirement>
+            <requirement>Create at least 3 evaluations per Skill to test effectiveness</requirement>
+            <requirement>Implement feedback loops and validation steps for critical operations</requirement>
+            <requirement>Use workflows with clear checklists for multi-step processes</requirement>
+            <requirement>Bundle scripts that handle errors explicitly (solve, don't punt)</requirement>
+            <requirement>Test Skills across different Claude models (Haiku, Sonnet, Opus)</requirement>
+            <requirement>Ensure descriptions enable accurate Skill discovery by Claude</requirement>
+            <requirement>Implement progressive disclosure to minimize context usage</requirement>
+        </quality_standards>
+
+        <skill_structure_requirements>
+            <requirement>
+                Each Skill directory must contain:
+                - SKILL.md (required) with YAML frontmatter and markdown body
+                - reference/ directory (optional) for domain-specific documentation
+                - scripts/ directory (optional) for utility scripts
+                - examples/ directory (optional) for usage examples
+            </requirement>
+            <requirement>
+                SKILL.md structure:
+                ---
+                name: skill-name-here
+                description: What the Skill does and when to use it with key trigger terms
+                ---
+
+                # Skill Title
+
+                ## Quick Start
+                [Basic usage patterns]
+
+                ## Advanced Features
+                [Links to reference files for progressive disclosure]
+
+                ## Workflows
+                [Multi-step processes with checklists if applicable]
+            </requirement>
+        </skill_structure_requirements>
+    </requirements>
+
+    <suggested_skills_to_create>
+        <skill_category name="Project Architecture">
+            <skill name="understanding-project-structure">
+                <description>Navigate and understand the project's directory structure, architecture patterns, and organizational conventions. Use when exploring the codebase or explaining project layout.</description>
+                <priority>High</priority>
+            </skill>
+        </skill_category>
+
+        <skill_category name="Development Workflows">
+            <skill name="creating-tasks">
+                <description>Generate structured task assignments in XML format following the project's task management conventions. Use when creating new development tasks or assignments for specialized agents.</description>
+                <priority>High</priority>
+            </skill>
+
+            <skill name="managing-skills">
+                <description>Create, update, and maintain Agent Skills following Anthropic best practices. Use when building new Skills or improving existing ones for the project.</description>
+                <priority>High</priority>
+            </skill>
+        </skill_category>
+
+        <skill_category name="Code Quality">
+            <skill name="testing-procedures">
+                <description>Run tests, analyze coverage, and ensure code quality following project testing standards. Use when validating code changes or implementing new features.</description>
+                <priority>Medium</priority>
+            </skill>
+
+            <skill name="debugging-workflow">
+                <description>Systematic debugging procedures for common issues in the project. Use when troubleshooting errors or investigating unexpected behavior.</description>
+                <priority>Medium</priority>
+            </skill>
+        </skill_category>
+
+        <skill_category name="Documentation">
+            <skill name="generating-documentation">
+                <description>Create comprehensive documentation following project standards and conventions. Use when documenting features, APIs, or architectural decisions.</description>
+                <priority>Medium</priority>
+            </skill>
+        </skill_category>
+
+        <note>
+            These are suggested Skills - analyze the actual project codebase to identify the most valuable Skills to create based on discovered patterns and workflows.
+        </note>
+    </suggested_skills_to_create>
+
+    <deliverables>
+        <deliverable status="pending">Project codebase analysis report identifying key patterns and workflows</deliverable>
+        <deliverable status="pending">Minimum 3-5 high-quality project-specific Skills in .claude/skills/</deliverable>
+        <deliverable status="pending">Each Skill with proper YAML frontmatter (name, description)</deliverable>
+        <deliverable status="pending">SKILL.md bodies under 500 lines with progressive disclosure</deliverable>
+        <deliverable status="pending">Utility scripts bundled where deterministic operations are needed</deliverable>
+        <deliverable status="pending">Reference documentation in separate files (one level deep)</deliverable>
+        <deliverable status="pending">Skills index README.md in .claude/skills/ directory</deliverable>
+        <deliverable status="pending">At least 3 evaluations per Skill for testing effectiveness</deliverable>
+        <deliverable status="pending">Skills tested with representative prompts to verify activation</deliverable>
+    </deliverables>
+
+    <acceptance_criteria>
+        <criterion status="unchecked">All YAML frontmatter meets validation requirements (name, description)</criterion>
+        <criterion status="unchecked">Each SKILL.md body is under 500 lines</criterion>
+        <criterion status="unchecked">Descriptions include both what the Skill does AND when to use it</criterion>
+        <criterion status="unchecked">File paths use forward slashes (Unix-style)</criterion>
+        <criterion status="unchecked">Progressive disclosure implemented (3 levels: metadata → instructions → resources)</criterion>
+        <criterion status="unchecked">Skills activate correctly when prompted with relevant tasks</criterion>
+        <criterion status="unchecked">No time-sensitive information in Skills</criterion>
+        <criterion status="unchecked">Consistent terminology used throughout each Skill</criterion>
+        <criterion status="unchecked">Workflows include clear checklists for multi-step processes</criterion>
+        <criterion status="unchecked">Scripts handle errors explicitly (no punting to Claude)</criterion>
+        <criterion status="unchecked">All Skills under 8MB total size</criterion>
+        <criterion status="unchecked">Skills index README.md provides clear overview</criterion>
+        <criterion status="unchecked">At least 3 evaluations created per Skill</criterion>
+        <criterion status="unchecked">Skills tested across different Claude models (where applicable)</criterion>
+    </acceptance_criteria>
+
+    <skill_authoring_checklist>
+        <core_quality>
+            <check>Description is specific and includes key terms</check>
+            <check>Description includes both what the Skill does and when to use it</check>
+            <check>SKILL.md body is under 500 lines</check>
+            <check>Additional details are in separate files (if needed)</check>
+            <check>No time-sensitive information (or in "old patterns" section)</check>
+            <check>Consistent terminology throughout</check>
+            <check>Examples are concrete, not abstract</check>
+            <check>File references are one level deep</check>
+            <check>Progressive disclosure used appropriately</check>
+            <check>Workflows have clear steps</check>
+        </core_quality>
+
+        <code_and_scripts>
+            <check>Scripts solve problems rather than punt to Claude</check>
+            <check>Error handling is explicit and helpful</check>
+            <check>No "voodoo constants" (all values justified)</check>
+            <check>Required packages listed in instructions</check>
+            <check>Scripts have clear documentation</check>
+            <check>No Windows-style paths (all forward slashes)</check>
+            <check>Validation/verification steps for critical operations</check>
+            <check>Feedback loops included for quality-critical tasks</check>
+        </code_and_scripts>
+
+        <testing>
+            <check>At least three evaluations created</check>
+            <check>Tested with Haiku, Sonnet, and Opus (where applicable)</check>
+            <check>Tested with real usage scenarios</check>
+            <check>Team feedback incorporated (if applicable)</check>
+        </testing>
+    </skill_authoring_checklist>
+
+    <best_practices_summary>
+        <practice name="Conciseness">
+            Only add context Claude doesn't already have. Challenge each piece of information: "Does Claude really need this explanation?" The context window is a public good shared with conversation history, other Skills' metadata, and the actual request.
+        </practice>
+
+        <practice name="Progressive Disclosure">
+            Structure Skills with three levels:
+            1. Metadata (always loaded): name and description in YAML frontmatter (~100 tokens)
+            2. Instructions (loaded when triggered): SKILL.md body (under 5k tokens)
+            3. Resources (loaded as needed): bundled files executed via bash without loading into context
+        </practice>
+
+        <practice name="Appropriate Freedom">
+            Match level of specificity to task fragility:
+            - High freedom: Multiple approaches valid, decisions depend on context
+            - Medium freedom: Preferred pattern exists, some variation acceptable
+            - Low freedom: Operations are fragile, consistency critical, specific sequence required
+        </practice>
+
+        <practice name="Evaluation-Driven Development">
+            1. Identify gaps: Run Claude without Skill, document failures
+            2. Create evaluations: Build 3 scenarios testing these gaps
+            3. Establish baseline: Measure performance without Skill
+            4. Write minimal instructions: Just enough to pass evaluations
+            5. Iterate: Execute evaluations, compare, refine
+        </practice>
+
+        <practice name="Iterative Development with Claude">
+            Work with one Claude instance (Claude A) to create Skills that other instances (Claude B) will use:
+            1. Complete task without Skill using Claude A
+            2. Identify reusable pattern
+            3. Ask Claude A to create Skill
+            4. Review for conciseness
+            5. Improve information architecture
+            6. Test with Claude B on similar tasks
+            7. Iterate based on observation
+        </practice>
+    </best_practices_summary>
+
+    <error_correction_phase>
+        <title>Skills Validation & Testing</title>
+        <steps>
+            <step number="1">
+                <name>YAML Frontmatter Validation</name>
+                <actions>
+                    <action>Verify name field: max 64 chars, lowercase/numbers/hyphens only</action>
+                    <action>Verify description field: max 1024 chars, includes what AND when</action>
+                    <action>Check for XML tags in name/description (not allowed)</action>
+                    <action>Check for reserved words "anthropic", "claude" in name</action>
+                </actions>
+            </step>
+
+            <step number="2">
+                <name>File Structure Validation</name>
+                <actions>
+                    <action>Verify SKILL.md body is under 500 lines</action>
+                    <action>Check all file paths use forward slashes</action>
+                    <action>Verify file references are one level deep from SKILL.md</action>
+                    <action>Confirm total Skill size is under 8MB</action>
+                </actions>
+            </step>
+
+            <step number="3">
+                <name>Content Quality Validation</name>
+                <actions>
+                    <action>Review for conciseness (remove unnecessary explanations)</action>
+                    <action>Check for time-sensitive information</action>
+                    <action>Verify consistent terminology</action>
+                    <action>Ensure progressive disclosure is implemented</action>
+                    <action>Validate workflows have clear checklists</action>
+                </actions>
+            </step>
+
+            <step number="4">
+                <name>Skill Activation Testing</name>
+                <actions>
+                    <action>Test Skill activation with relevant prompts</action>
+                    <action>Verify Claude discovers and uses Skill appropriately</action>
+                    <action>Run at least 3 evaluation scenarios</action>
+                    <action>Test across Claude models (Haiku, Sonnet, Opus) if applicable</action>
+                </actions>
+            </step>
+
+            <step number="5">
+                <name>Error Resolution Loop</name>
+                <conditions>
+                    <if_validation_passes>Skill is ready for use</if_validation_passes>
+                    <if_validation_fails>Fix issues and repeat validation from step 1</if_validation_fails>
+                    <note>Continue this loop until all validation checks pass</note>
+                </conditions>
+            </step>
+
+            <step number="6">
+                <name>Final Verification Checklist</name>
+                <checks>
+                    <check status="pending">All YAML frontmatter valid and compliant</check>
+                    <check status="pending">All file structures correct</check>
+                    <check status="pending">Content quality meets standards</check>
+                    <check status="pending">Skills activate correctly with test prompts</check>
+                    <check status="pending">Evaluations pass successfully</check>
+                    <check status="pending">No critical issues or errors remaining</check>
+                </checks>
+            </step>
+        </steps>
+    </error_correction_phase>
+
+    <anti_patterns_to_avoid>
+        <anti_pattern name="Windows-style paths">
+            ❌ Avoid: scripts\helper.py, reference\guide.md
+            ✓ Use: scripts/helper.py, reference/guide.md
+        </anti_pattern>
+
+        <anti_pattern name="Too many options">
+            ❌ Avoid: "You can use pypdf, or pdfplumber, or PyMuPDF, or pdf2image..."
+            ✓ Use: "Use pdfplumber for text extraction. For scanned PDFs requiring OCR, use pdf2image with pytesseract instead."
+        </anti_pattern>
+
+        <anti_pattern name="Vague descriptions">
+            ❌ Avoid: "Helps with documents"
+            ✓ Use: "Extract text and tables from PDF files, fill forms, merge documents. Use when working with PDF files or when the user mentions PDFs, forms, or document extraction."
+        </anti_pattern>
+
+        <anti_pattern name="Punting to Claude in scripts">
+            ❌ Avoid: Just fail and let Claude figure it out
+            ✓ Use: Handle errors explicitly with alternative paths and clear error messages
+        </anti_pattern>
+
+        <anti_pattern name="Magic numbers without justification">
+            ❌ Avoid: TIMEOUT = 47  # Why 47?
+            ✓ Use: # HTTP requests typically complete within 30 seconds
+                   # Longer timeout accounts for slow connections
+                   REQUEST_TIMEOUT = 30
+        </anti_pattern>
+
+        <anti_pattern name="Deeply nested references">
+            ❌ Avoid: SKILL.md → advanced.md → details.md → actual content
+            ✓ Use: SKILL.md → {advanced.md, reference.md, examples.md} (one level deep)
+        </anti_pattern>
+    </anti_patterns_to_avoid>
+
+    <handoff_instructions>
+        <instruction>After completing Skills creation, update project documentation to reference new Skills</instruction>
+        <instruction>Consider creating a Skills usage guide for team members</instruction>
+        <instruction>Monitor Skill usage patterns and iterate based on actual behavior</instruction>
+        <instruction>Set up regular review cycle to update Skills as project evolves</instruction>
+    </handoff_instructions>
+</task_assignment>

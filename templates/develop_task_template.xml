@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task_manager_prompt>
+
+    <your_role>@/Users/oleksii/.claude/agents/TASK_MANAGER_PROMPT.xml</your_role>
+
+    <instruction>
+        Prepare a task description for collaboration of the following roles in priority order:
+    </instruction>
+
+    <agent_roles priority_order="true">
+        <agent priority="1">@/Users/oleksii/Projects/Node/CrowdTamers/heyvail/.claude/agents/TECHNICAL_LEAD_PROMPT.md
+        </agent>
+        <agent priority="2">
+            @/Users/oleksii/Projects/Node/CrowdTamers/heyvail/.claude/agents/LOGGER_INSPECTOR_PROMPT.md
+        </agent>
+        <agent priority="3">@/Users/oleksii/Projects/Node/CrowdTamers/heyvail/.claude/agents/QA_ENGINEER_PROMPT.md
+        </agent>
+        <agent priority="4">
+            @/Users/oleksii/Projects/Node/CrowdTamers/heyvail/.claude/agents/ANALYZE_AND_CLEAN_CODE_PROMPT.md
+        </agent>
+        <agent priority="5">@/Users/oleksii/.claude/agents/SKILLS_MASTER_AGENT.xml</agent>
+    </agent_roles>
+
+    <note>
+        <task_preparation>
+            Prepare the task in a single document describing phases for all roles and create a subtask for the current
+            task.
+        </task_preparation>
+
+        <task_storage>
+            <location>@/Users/oleksii/Projects/Node/CrowdTamers/heyvail/.claude/tasks</location>
+            <format>XML file</format>
+        </task_storage>
+
+        <kanban_integration>
+            After creating the task, create a task in vibe-kanban.
+        </kanban_integration>
+    </note>
+
+    <documentation_study>
+        <instruction>Study documentation before building tasks:</instruction>
+        <required_docs>
+            <doc>/Users/oleksii/Projects/Node/CrowdTamers/heyvail/CLAUDE.md</doc>
+            <doc>/Users/oleksii/Projects/Node/CrowdTamers/heyvail/README.md</doc>
+        </required_docs>
+        <skills_directory>/Users/oleksii/Projects/Node/CrowdTamers/heyvail/.claude/skills</skills_directory>
+    </documentation_study>
+
+    <error_correction_phase>
+        <instruction>
+            At the end of task execution, add instructions for the agent to start the application.
+        </instruction>
+
+        <error_loop>
+            <step>If any errors occur, fix them and repeat the action until the application starts successfully.</step>
+            <step>After that, run tests and follow the same procedure.</step>
+        </error_loop>
+    </error_correction_phase>
+
+    <task>
+
+    </task>
+
+</task_manager_prompt>
