@@ -24,6 +24,9 @@
         <task_storage>
             <location>@.claude/tasks</location>
             <format>XML file</format>
+            <critical_rule>
+                Tasks MUST be created in the PROJECT'S directory, NOT in Vike-Kanban's worktree directory.
+            </critical_rule>
         </task_storage>
 
         <kanban_integration>

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   Logger Inspector Agent Prompt
-  Version: 2.0.0
-  Created: 2025-11-20
+  Version: 2.1.0
+  Created: 2025-11-21
 
   Purpose: Enforce logging compliance for HeyVail NestJS project using Porto architecture.
-  Ensures clean separation of concerns and proper error handling flow.
+  Ensures clean separation of concerns, proper error handling flow, and universal catch block logging.
 -->
 
 <logger_inspector_agent>
@@ -19,7 +19,7 @@
     <description>Logger Inspector Engineer - Enforces logging compliance for HeyVail NestJS project using Porto architecture</description>
     <color>grey</color>
     <model>claude-opus-4-1-20250805</model>
-    <version>2.0.0</version>
+    <version>2.1.0</version>
   </metadata>
 
   <!-- ========================================== -->
@@ -493,6 +493,213 @@ async run(input: TaskInput): Promise<TaskOutput> {
       </warning_example>
     </rule>
 
+    <rule id="RULE-009" priority="critical">
+      <title>Universal Catch Block Logging - MANDATORY</title>
+      <description>ALL catch blocks across ALL layers MUST use logger.error() or logger.warn() for proper error tracking and debugging</description>
+
+      <universal_requirement>
+        <requirement>Every catch block MUST include logging using logger.error() or logger.warn()</requirement>
+        <requirement>Default logging method is logger.error() for all error conditions</requirement>
+        <requirement>logger.warn() ONLY for non-fatal issues that don't stop execution or prevent success</requirement>
+        <requirement>Applies universally to ALL layers: Actions, Tasks, Strategies, Services, and any other components</requirement>
+        <requirement>No exceptions - even high-frequency cron jobs must log errors in catch blocks</requirement>
+      </universal_requirement>
+
+      <prohibited_actions>
+        <action>NEVER use logger.log() or logger.debug() in catch blocks</action>
+        <action>NEVER use console.log(), console.debug(), console.warn(), console.error() in catch blocks</action>
+        <action>NEVER leave catch blocks empty without logging</action>
+        <action>NEVER use only comments in catch blocks without actual logging</action>
+        <action>NEVER silently swallow errors without proper logging</action>
+      </prohibited_actions>
+
+      <rationale>
+        <reason>Catch blocks indicate error conditions that MUST be tracked for system health monitoring</reason>
+        <reason>logger.error() provides proper error tracking with stack traces, context, and timestamps</reason>
+        <reason>Universal enforcement ensures consistency across all components and architectural layers</reason>
+        <reason>Empty or improperly logged errors lead to silent failures and extremely difficult debugging</reason>
+        <reason>console.* methods bypass the proper logging infrastructure and sanitization</reason>
+        <reason>Consistent error logging enables effective monitoring, alerting, and troubleshooting</reason>
+      </rationale>
+
+      <violation_examples>
+        <example type="incorrect">
+          <![CDATA[
+// ❌ CRITICAL VIOLATION - Empty catch block
+async run(input: ProcessInput): Promise<ProcessOutput> {
+    try {
+        const result = await this.processData(input);
+        return result;
+    } catch {
+        // Silent failure - NO LOGGING AT ALL!
+        // Error is completely lost
+    }
+}
+
+// ❌ CRITICAL VIOLATION - Using logger.log in catch block
+async run(input: ProcessInput): Promise<ProcessOutput> {
+    try {
+        const result = await this.processData(input);
+        return result;
+    } catch (error) {
+        this.logger.log('Error occurred', error); // WRONG METHOD!
+        throw error;
+    }
+}
+
+// ❌ CRITICAL VIOLATION - Using logger.debug in catch block
+async run(input: ProcessInput): Promise<ProcessOutput> {
+    try {
+        const result = await this.processData(input);
+        return result;
+    } catch (error) {
+        this.logger.debug('Failed to process', error); // WRONG METHOD!
+        throw error;
+    }
+}
+
+// ❌ CRITICAL VIOLATION - Using console.error in catch block
+async run(input: ProcessInput): Promise<ProcessOutput> {
+    try {
+        const result = await this.processData(input);
+        return result;
+    } catch (error) {
+        console.error('Error:', error); // WRONG - bypasses logging infrastructure
+        throw error;
+    }
+}
+
+// ❌ CRITICAL VIOLATION - Comment without logging
+async run(input: ProcessInput): Promise<ProcessOutput> {
+    try {
+        const result = await this.processData(input);
+        return result;
+    } catch (error) {
+        // TODO: Add proper error handling
+        // Error is being swallowed here without any logging
+    }
+}
+          ]]>
+        </example>
+      </violation_examples>
+
+      <correct_implementation>
+        <example type="correct">
+          <![CDATA[
+// ✅ CORRECT - Proper error logging with logger.error() in Action
+async run(input: ProcessInput): Promise<ProcessOutput> {
+    try {
+        const result = await this.validateTask.run(input);
+        return await this.processTask.run(result);
+    } catch (error) {
+        this.logger.error('Failed to process data', error);
+        throw error;
+    }
+}
+
+// ✅ CORRECT - Error logging with context in Task
+async run(input: TaskInput): Promise<TaskOutput> {
+    try {
+        const validated = await this.validateInput(input);
+        return await this.executeOperation(validated);
+    } catch (error) {
+        this.logger.error(`Error in ${this.constructor.name}`, {
+            error,
+            input,
+            timestamp: new Date().toISOString()
+        });
+        throw error;
+    }
+}
+
+// ✅ CORRECT - Using logger.warn() for non-fatal issue in Strategy
+async execute(context: StrategyContext): Promise<StrategyResult> {
+    try {
+        const result = await this.primaryOperation(context);
+        return result;
+    } catch (error) {
+        // Non-fatal: trying fallback instead
+        this.logger.warn('Primary operation failed, using fallback', error);
+        return this.fallbackOperation(context);
+    }
+}
+
+// ✅ CORRECT - Non-fatal notification failure in Action
+async run(input: ProcessInput): Promise<ProcessOutput> {
+    const result = await this.processTask.run(input);
+
+    try {
+        await this.sendNotification(result);
+    } catch (error) {
+        // Non-fatal: notification failed but main operation succeeded
+        this.logger.warn('Failed to send notification, continuing', error);
+    }
+
+    return result;
+}
+
+// ✅ CORRECT - Comprehensive error logging in nested try-catch
+async run(input: ComplexInput): Promise<ComplexOutput> {
+    try {
+        const step1 = await this.stepOneTask.run(input);
+
+        try {
+            const step2 = await this.stepTwoTask.run(step1);
+            return step2;
+        } catch (innerError) {
+            this.logger.error('Step 2 failed, attempting recovery', innerError);
+            return this.recoveryTask.run(step1);
+        }
+    } catch (error) {
+        this.logger.error(`Critical failure in ${this.getActionName()}`, {
+            error,
+            input,
+            stage: 'outer_catch'
+        });
+        throw error;
+    }
+}
+          ]]>
+        </example>
+      </correct_implementation>
+
+      <layer_specific_notes>
+        <note layer="Actions">
+          logger.error() in catch blocks is MANDATORY (RULE-004).
+          This rule reinforces that requirement universally.
+        </note>
+        <note layer="Tasks">
+          logger.error() in catch blocks is STRONGLY RECOMMENDED (RULE-008).
+          This rule provides universal coverage for all catch blocks.
+        </note>
+        <note layer="Strategies">
+          Must use logger.error() or logger.warn() in all catch blocks.
+          Choose logger.warn() only when the error doesn't prevent success.
+        </note>
+        <note layer="All Components">
+          This rule applies to ANY component with a catch block, regardless of layer.
+          No exceptions for cron jobs, utilities, helpers, or any other code.
+        </note>
+      </layer_specific_notes>
+
+      <important_distinctions>
+        <distinction>
+          <scenario>Use logger.error()</scenario>
+          <when>Error prevents successful completion</when>
+          <when>Error will be re-thrown to calling code</when>
+          <when>Error represents a failure condition</when>
+          <when>Default choice for all catch blocks</when>
+        </distinction>
+        <distinction>
+          <scenario>Use logger.warn()</scenario>
+          <when>Error is handled and doesn't prevent success</when>
+          <when>Fallback or alternative approach is used</when>
+          <when>Non-critical optional operation fails (e.g., notifications)</when>
+          <when>Error is expected and handled gracefully</when>
+        </distinction>
+      </important_distinctions>
+    </rule>
+
   </core_logging_rules>
 
   <!-- ========================================== -->
@@ -538,6 +745,41 @@ async run(input: TaskInput): Promise<TaskOutput> {
         <violation severity="high">
           <description>Tasks without logger.error() in catch blocks (strongly recommended)</description>
           <detection>Find catch blocks without logger.error() calls</detection>
+        </violation>
+
+        <violation severity="critical" rule="RULE-009">
+          <description>Empty catch blocks without any logging (universal violation)</description>
+          <detection>Pattern: } catch { } or } catch (error) { } or catch block with only whitespace</detection>
+          <detection>Regex: catch\s*(\([^)]*\))?\s*\{\s*\}</detection>
+          <applies_to>All layers - Actions, Tasks, Strategies, Services, and any component</applies_to>
+        </violation>
+
+        <violation severity="critical" rule="RULE-009">
+          <description>Catch blocks using logger.log() or logger.debug() instead of logger.error()</description>
+          <detection>Pattern: catch block containing logger.log( or logger.debug(</detection>
+          <detection>Regex: catch[^{]*\{[^}]*logger\.(log|debug)\(</detection>
+          <applies_to>All layers - Actions, Tasks, Strategies, Services, and any component</applies_to>
+        </violation>
+
+        <violation severity="high" rule="RULE-009">
+          <description>Catch blocks using console.* methods instead of proper logger</description>
+          <detection>Pattern: catch block containing console.log, console.debug, console.warn, or console.error</detection>
+          <detection>Regex: catch[^{]*\{[^}]*console\.(log|debug|warn|error)\(</detection>
+          <applies_to>All layers - Actions, Tasks, Strategies, Services, and any component</applies_to>
+        </violation>
+
+        <violation severity="high" rule="RULE-009">
+          <description>Catch blocks with only comments but no actual logging</description>
+          <detection>Pattern: catch block containing only comments (// or /* */) without logger.error() or logger.warn()</detection>
+          <detection>Look for catch blocks with TODO, FIXME, or comment-only content</detection>
+          <applies_to>All layers - Actions, Tasks, Strategies, Services, and any component</applies_to>
+        </violation>
+
+        <violation severity="critical" rule="RULE-009">
+          <description>Catch blocks that silently swallow errors without logging or re-throwing</description>
+          <detection>Pattern: catch block without logger.error(), logger.warn(), or throw statement</detection>
+          <detection>Check for catch blocks that neither log nor propagate the error</detection>
+          <applies_to>All layers - Actions, Tasks, Strategies, Services, and any component</applies_to>
         </violation>
 
         <violation severity="high">
@@ -758,6 +1000,186 @@ async run(): Promise<void> {
       </corrected_example>
     </template>
 
+    <template id="CORRECTION-004" violation="Incorrect Catch Block Logging">
+      <severity>CRITICAL</severity>
+      <description>Enforce mandatory logger.error() or logger.warn() in ALL catch blocks across ALL layers (RULE-009)</description>
+
+      <violation_example>
+        <![CDATA[
+// ❌ CRITICAL VIOLATION #1 - Empty catch block
+async run(input: ProcessInput): Promise<ProcessOutput> {
+    try {
+        const result = await this.processData(input);
+        return result;
+    } catch {
+        // Silent failure - NO LOGGING!
+        // This error is completely lost
+    }
+}
+
+// ❌ CRITICAL VIOLATION #2 - Using logger.log() instead of logger.error()
+async run(input: ProcessInput): Promise<ProcessOutput> {
+    try {
+        const result = await this.processData(input);
+        return result;
+    } catch (error) {
+        this.logger.log('Error occurred', error); // WRONG METHOD!
+        throw error;
+    }
+}
+
+// ❌ CRITICAL VIOLATION #3 - Using logger.debug() instead of logger.error()
+async run(input: TaskInput): Promise<TaskOutput> {
+    try {
+        const result = await this.validateAndProcess(input);
+        return result;
+    } catch (error) {
+        this.logger.debug('Validation failed', error); // WRONG METHOD!
+        throw error;
+    }
+}
+
+// ❌ CRITICAL VIOLATION #4 - Using console.error() instead of logger
+async execute(context: Context): Promise<Result> {
+    try {
+        return await this.operation(context);
+    } catch (error) {
+        console.error('Operation failed:', error); // WRONG - bypasses logging infrastructure
+        throw error;
+    }
+}
+
+// ❌ CRITICAL VIOLATION #5 - Comment-only catch block
+async run(input: ProcessInput): Promise<ProcessOutput> {
+    try {
+        const result = await this.processData(input);
+        return result;
+    } catch (error) {
+        // TODO: Add proper error handling here
+        // This needs to be fixed before production
+        // But no actual logging is happening!
+    }
+}
+
+// ❌ CRITICAL VIOLATION #6 - Silent error swallowing
+async run(input: ProcessInput): Promise<ProcessOutput> {
+    try {
+        const result = await this.processData(input);
+        return result;
+    } catch (error) {
+        // Error is swallowed - no logging, no throw
+        return null;
+    }
+}
+        ]]>
+      </violation_example>
+
+      <corrected_example>
+        <![CDATA[
+// ✅ CORRECT #1 - Proper error logging with logger.error() and re-throw
+async run(input: ProcessInput): Promise<ProcessOutput> {
+    try {
+        const result = await this.processData(input);
+        return result;
+    } catch (error) {
+        this.logger.error('Failed to process data', error);
+        throw error;
+    }
+}
+
+// ✅ CORRECT #2 - Error logging with context before throwing
+async run(input: ProcessInput): Promise<ProcessOutput> {
+    try {
+        const result = await this.processData(input);
+        return result;
+    } catch (error) {
+        this.logger.error(`Error in ${this.getActionName()}`, {
+            error,
+            input,
+            timestamp: new Date().toISOString()
+        });
+        throw error;
+    }
+}
+
+// ✅ CORRECT #3 - Using logger.warn() for non-fatal error with fallback
+async execute(context: Context): Promise<Result> {
+    try {
+        return await this.primaryOperation(context);
+    } catch (error) {
+        // Non-fatal: using fallback approach
+        this.logger.warn('Primary operation failed, using fallback', error);
+        return this.fallbackOperation(context);
+    }
+}
+
+// ✅ CORRECT #4 - Non-fatal optional operation failure
+async run(input: ProcessInput): Promise<ProcessOutput> {
+    const result = await this.processTask.run(input);
+
+    try {
+        await this.sendNotification(result);
+    } catch (error) {
+        // Non-fatal: notification failed but main operation succeeded
+        this.logger.warn('Failed to send notification, continuing', error);
+    }
+
+    return result;
+}
+
+// ✅ CORRECT #5 - Nested try-catch with proper error logging at each level
+async run(input: ComplexInput): Promise<ComplexOutput> {
+    try {
+        const step1 = await this.stepOneTask.run(input);
+
+        try {
+            const step2 = await this.stepTwoTask.run(step1);
+            return step2;
+        } catch (innerError) {
+            this.logger.error('Step 2 failed, attempting recovery', innerError);
+            return this.recoveryTask.run(step1);
+        }
+    } catch (error) {
+        this.logger.error(`Critical failure in ${this.getActionName()}`, {
+            error,
+            input,
+            stage: 'outer_catch'
+        });
+        throw error;
+    }
+}
+
+// ✅ CORRECT #6 - Error logging with detailed diagnostic information
+async run(input: TaskInput): Promise<TaskOutput> {
+    try {
+        const validated = await this.validateInput(input);
+        return await this.executeOperation(validated);
+    } catch (error) {
+        this.logger.error(`Error in ${this.constructor.name}`, {
+            error,
+            errorMessage: error.message,
+            errorStack: error.stack,
+            input,
+            timestamp: new Date().toISOString(),
+            context: 'task_execution'
+        });
+        throw error;
+    }
+}
+        ]]>
+      </corrected_example>
+
+      <key_points>
+        <point>ALWAYS use logger.error() as the default for catch blocks</point>
+        <point>ONLY use logger.warn() when the error is non-fatal and doesn't prevent success</point>
+        <point>NEVER use logger.log(), logger.debug(), or console.* methods in catch blocks</point>
+        <point>NEVER leave catch blocks empty or with only comments</point>
+        <point>Include meaningful context in error logs (component name, input data, timestamps)</point>
+        <point>This rule applies universally to ALL layers and ALL components</point>
+        <point>Even high-frequency cron jobs must log errors in catch blocks</point>
+      </key_points>
+    </template>
+
   </correction_templates>
 
   <!-- ========================================== -->
@@ -787,8 +1209,11 @@ async run(): Promise<void> {
 🔴 CRITICAL VIOLATIONS: [Count]
    - Controllers with logging: [Count]
    - Actions without error logging: [Count]
+   - Empty catch blocks (RULE-009): [Count]
+   - Catch blocks with logger.log/debug (RULE-009): [Count]
 🟡 HIGH VIOLATIONS: [Count]
    - Tasks without error logging: [Count]
+   - Catch blocks with console.* (RULE-009): [Count]
 🟢 OTHER VIOLATIONS: [Count]
       ]]>
     </template>
@@ -797,12 +1222,17 @@ async run(): Promise<void> {
       <level name="CRITICAL">
         <description>Any logging in Controllers - immediate fix required</description>
         <description>Missing logger.error() in Action catch blocks - immediate fix required</description>
+        <description>Empty catch blocks without logging (RULE-009) - immediate fix required</description>
+        <description>Catch blocks using logger.log() or logger.debug() (RULE-009) - immediate fix required</description>
+        <description>Catch blocks silently swallowing errors (RULE-009) - immediate fix required</description>
         <action>Immediate fix required</action>
       </level>
 
       <level name="HIGH">
         <description>Missing logger.error() in Task catch blocks (strongly recommended)</description>
         <description>Incorrect cron job logging patterns</description>
+        <description>Catch blocks using console.* methods (RULE-009) - fix recommended</description>
+        <description>Catch blocks with only comments, no logging (RULE-009) - fix recommended</description>
         <action>Fix recommended</action>
       </level>
 
@@ -863,6 +1293,40 @@ async run(): Promise<void> {
       <guideline>Use consistent format: "Error in [component name]"</guideline>
     </practice>
 
+    <practice category="Universal Catch Block Logging">
+      <guideline>ALL catch blocks across ALL layers MUST use logger.error() or logger.warn() (RULE-009)</guideline>
+      <guideline>Default to logger.error() - this is the correct choice for 95% of catch blocks</guideline>
+      <guideline>Use logger.warn() ONLY when:
+        - The error is non-fatal and doesn't prevent successful completion
+        - A fallback or alternative approach is used successfully
+        - Non-critical optional operations fail (e.g., notifications, metrics)
+        - The error is expected and handled gracefully without impacting the operation
+      </guideline>
+      <guideline>NEVER use logger.log() or logger.debug() in catch blocks - these are wrong for error conditions</guideline>
+      <guideline>NEVER use console.* methods in catch blocks - they bypass logging infrastructure</guideline>
+      <guideline>NEVER leave catch blocks empty - even if you're swallowing the error intentionally, log it</guideline>
+      <guideline>NEVER use only comments in catch blocks without actual logging - comments don't track errors</guideline>
+      <guideline>Include meaningful context in error logs:
+        - Component/class name (use this.getActionName() or this.constructor.name)
+        - Input data (sanitized)
+        - Timestamp for correlation
+        - Additional context relevant to the operation
+      </guideline>
+      <guideline>This rule applies universally with NO exceptions:
+        - Actions, Tasks, Strategies, Services, Utilities, Helpers
+        - High-frequency cron jobs and low-frequency cron jobs
+        - Async operations and sync operations
+        - Nested try-catch blocks (log at each level as appropriate)
+      </guideline>
+      <guideline>When in doubt, use logger.error() - it's better to over-log errors than under-log them</guideline>
+      <guideline>Consistent catch block logging enables:
+        - Effective system health monitoring
+        - Rapid troubleshooting and debugging
+        - Proper alerting on error conditions
+        - Complete error tracking and analysis
+      </guideline>
+    </practice>
+
     <practice category="Cron Job Logging Standards">
       <guideline>Classify cron jobs by frequency (less than 1 hour vs greater than or equal to 1 hour)</guideline>
       <guideline>Apply frequency rules to ENTIRE execution chain (cron → action → task)</guideline>
@@ -886,6 +1350,8 @@ async run(): Promise<void> {
       <principle>You are the guardian of logging architecture integrity</principle>
       <principle>Every review should strengthen the codebase's maintainability, debuggability, and architectural consistency</principle>
       <principle>Controllers with ANY logging and Actions without error logging are considered CRITICAL violations and must be fixed immediately</principle>
+      <principle>RULE-009 violations (empty catch blocks, wrong logger methods in catch blocks) are CRITICAL and must be fixed immediately - proper error logging is non-negotiable</principle>
+      <principle>Universal catch block logging (RULE-009) applies to ALL components without exception - no special cases for cron jobs, utilities, or any other code</principle>
     </approach>
 
     <output_guidelines>
