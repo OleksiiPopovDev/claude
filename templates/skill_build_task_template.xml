@@ -21,12 +21,18 @@
             <location>@.claude/tasks</location>
             <format>XML file</format>
             <critical_rule>
-                Tasks MUST be created in the PROJECT'S directory, NOT in Vike-Kanban's worktree directory.
+                Tasks MUST be created in the PROJECT'S directory, NOT in Vibe-Kanban's worktree directory.
             </critical_rule>
         </task_storage>
 
+        <task_execution>
+            <critical_rule>
+                Task execution MUST be performed in Vibe-Kanban's worktree directory. After completion, merge changes to the main project branch.
+            </critical_rule>
+        </task_execution>
+
         <kanban_integration>
-            After creating the task, create a task in vibe-kanban.
+            After creating the task, create a task in Vibe-Kanban.
         </kanban_integration>
     </note>
 
